@@ -42,7 +42,7 @@ const Login: Component = () => {
         </div>
         <button
           onClick={() => handleLogin()}
-          class="mt-8 h-12 border-2 border-black bg-black p-2.5 text-white hover:bg-gray-700 hover:shadow-[2px_2px_0px_rgba(0,0,0,1)]"
+          class="mt-4 h-12 border-2 border-black bg-black p-2.5 text-white hover:bg-gray-700 hover:shadow-[2px_2px_0px_rgba(0,0,0,1)]"
         >
           Entrar
         </button>

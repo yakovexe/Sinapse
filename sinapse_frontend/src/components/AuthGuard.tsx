@@ -3,7 +3,7 @@ import { createRenderEffect, createSignal, JSX, on, ParentProps, Show } from "so
 
 async function fakeAuth() {
     setTimeout(() => {}, 1000);
-    return false;
+    return true;
 }
 
 export function AuthGuard(props: ParentProps): JSX.Element {

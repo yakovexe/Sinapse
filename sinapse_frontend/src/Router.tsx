@@ -1,19 +1,20 @@
-import { Router, Route, RouteSectionProps } from "@solidjs/router";
+import { Router, Route } from "@solidjs/router";
 import App from "./App";
-import Home from "./pages/Home";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import AboutUs from "./pages/AboutUs";
-import CardsHome from "./pages/CardsHome";
+import { lazy } from "solid-js";
+import { AuthGuard } from "./components/AuthGuard";
 
 const RouterComponent = () => {
   return (
     <Router root={App}>
-      <Route path="/" component={Home}></Route>
-      <Route path="/login" component={Login} />
-      <Route path="/register" component={Register} />
-      <Route path="/aboutus" component={AboutUs} />
-      <Route path="/cardshome" component={CardsHome} />
+      {/* Public Routes */}
+      <Route path="/" component={lazy(() => import("./pages/Home"))}></Route>
+      <Route path="/login" component={lazy(() => import("./pages/Login"))} />
+      <Route path="/register" component={lazy(() => import("./pages/Register"))} />
+      <Route path="/about" component={lazy(() => import("./pages/About"))} />
+      {/* Private Routes */}
+      <Route path="/" component={AuthGuard}>
+         <Route path="/cardshome" component={lazy(() => import("./pages/CardsHome"))}></Route>
+      </Route>
     </Router>
   );
 };

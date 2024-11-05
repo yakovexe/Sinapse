@@ -1,10 +1,12 @@
+import { useNavigate } from "@solidjs/router";
 import type { Component } from "solid-js";
 
 const Register: Component = () => {
+  const navigate = useNavigate();
 
   const handleLogin = () => {
     console.log("Login");
-    location.href = "/cardshome";
+    navigate("/cardshome");
   };
 
   return (

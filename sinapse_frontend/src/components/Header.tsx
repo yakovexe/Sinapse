@@ -11,7 +11,7 @@ const Header: Component = () => {
         <ul class="flex h-full items-center gap-2">
           <li>
             <A
-              href="/aboutus"
+              href="/about"
               class="h-12 border-2 border-black bg-[#FDFFF7] p-2.5 hover:bg-gray-200 hover:shadow-[2px_2px_0px_rgba(0,0,0,1)]"
             >
               Sobre nós

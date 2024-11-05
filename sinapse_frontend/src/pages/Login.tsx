@@ -1,10 +1,11 @@
 import type { Component } from "solid-js";
-import { redirect } from "@solidjs/router";
+import { redirect, useNavigate } from "@solidjs/router";
 
 const Login: Component = () => {
+  const navigate = useNavigate();
   const handleLogin = () => {
     console.log("Login");
-    location.href = "/cardshome";
+    navigate("/cardshome");
   };
 
   return (

@@ -1,7 +1,7 @@
 import { A } from "@solidjs/router";
 import type { Component } from "solid-js";
 
-const AboutUs: Component = () => {
+const About: Component = () => {
   return (
     <div
       class="flex h-full w-full flex-col items-center justify-center"
@@ -18,4 +18,4 @@ const AboutUs: Component = () => {
   );
 };
 
-export default AboutUs;
+export default About;

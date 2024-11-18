@@ -1,3 +1,5 @@
+# Based on template by Krypton: https://github.com/kkrypt0nn/Python-Discord-Bot-Template/tree/main
+
 import os
 import discord
 from discord.ext import commands

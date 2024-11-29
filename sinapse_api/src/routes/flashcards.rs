@@ -20,6 +20,8 @@ async fn post_flashcard(
     }
 }
 
+// TODO: #[post("/flashcards/{deck_id}")]
+
 // Solution based on https://stackoverflow.com/questions/67036017/how-to-get-collection-of-document-from-mongodb-cursor
 #[get("/flashcards")]
 async fn get_flashcards(client: web::Data<Client>) -> HttpResponse {
@@ -49,3 +51,5 @@ async fn get_flashcards(client: web::Data<Client>) -> HttpResponse {
         Err(err) => HttpResponse::InternalServerError().body(format!("Error: {}", err)),
     }
 }
+
+// TODO: #[delete("/flashcards/{id}")]

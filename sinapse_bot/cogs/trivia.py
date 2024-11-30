@@ -31,12 +31,12 @@ class Trivia(commands.Cog, name="Trivia"):
 
     @commands.hybrid_command(name="trivia", description="Start a trivia game")
     @app_commands.guilds(discord.Object(id=Guild_ID))
-    async def start_trivia(self, context: Context):
+    async def start_trivia(self, context: Context) -> None:
         self.current_question = random.choice(self.questions)
         await context.send(self.current_question["question"])
         await self.wait_for_answer(context)
 
-    async def wait_for_answer(self, context: Context):
+    async def wait_for_answer(self, context: Context) -> None:
         def check(message):
             return message.author == context.author and message.channel == context.channel
 

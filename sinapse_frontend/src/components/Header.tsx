@@ -6,7 +6,10 @@ const Header: Component = () => {
   const location = useLocation();
 
   createEffect(() => {
-    setIsPrivateRoute(location.pathname.startsWith("/cardshome"));
+    setIsPrivateRoute(
+      location.pathname.startsWith("/cardshome") ||
+        location.pathname.startsWith("/deck"),
+    );
   });
 
   const navItems = [

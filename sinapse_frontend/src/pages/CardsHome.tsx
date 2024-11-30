@@ -30,7 +30,7 @@ const CardsHome: Component = () => {
       }}
     >
       <div class="grid grid-cols-1 gap-6 rounded-md p-8 text-center md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-        <For each={cards} fallback={<p>Loading...</p>}>
+        <For each={cards} fallback={<p>Carregando...</p>}>
           {(card) => (
             <Card
               id={card.id}

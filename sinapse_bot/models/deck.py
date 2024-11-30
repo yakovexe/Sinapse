@@ -7,7 +7,7 @@ class Deck():
         self.user_token: str = user_token
         self.flashcards: Flashcard = flashcards
 
-    def fetch_flashcards(self):
+    def fetch_flashcards(self) -> None:
         response = requests.get(f"{self.api_url}/v1/flashcard", headers={"Authorization": f"Bearer {self.user_token}"})
         if response.status_code == 200:
             self.flashcards = [Flashcard(**fc) for fc in response.json()]

@@ -1,7 +1,8 @@
+# Based on template by Krypton: https://github.com/kkrypt0nn/Python-Discord-Bot-Template/tree/main
+
 import os
 import discord
 from discord.ext import commands
-from discord import app_commands
 from dotenv import load_dotenv
 from discord.ext.commands import Context
 

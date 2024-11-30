@@ -1,24 +1,23 @@
+import { useNavigate, useParams } from "@solidjs/router";
 import { For, type Component } from "solid-js";
 import FloatingButton from "../components/FloatingButton";
 import AddIcon from "../assets/misc/AddIcon";
 import Card from "../components/Card";
-import { useNavigate } from "@solidjs/router";
 
-const CardsHome: Component = () => {
-  const navigate = useNavigate();
-
+const Deck: Component = () => {
+  const params = useParams();
   const cards = [
     {
       id: 1,
-      name: "Matemática",
+      name: "Quem?",
     },
     {
       id: 2,
-      name: "Inglês",
+      name: "O que?",
     },
     {
       id: 3,
-      name: "Espanhol",
+      name: "Quando?",
     },
   ];
   return (
@@ -35,10 +34,8 @@ const CardsHome: Component = () => {
             <Card
               id={card.id}
               title={card.name}
-              text="Ver Baralho"
-              onClick={() => {
-                navigate(`/deck/${card.id}`);
-              }}
+              text="Ver Flashcard"
+              onClick={() => {}}
             ></Card>
           )}
         </For>
@@ -46,7 +43,7 @@ const CardsHome: Component = () => {
       <div class="fixed bottom-4 right-4">
         <FloatingButton
           Icon={AddIcon}
-          Text="Novo Baralho"
+          Text="Novo Flashcard"
           onClick={() => {}}
         ></FloatingButton>
       </div>
@@ -54,4 +51,4 @@ const CardsHome: Component = () => {
   );
 };
 
-export default CardsHome;
+export default Deck;

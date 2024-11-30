@@ -1,5 +1,10 @@
-use actix_web::web::{self, Json};
-use actix_web::{post, HttpResponse};
+use actix_web::{
+    get, post,
+    web::{self, Json},
+    HttpResponse,
+};
+use bson::{doc, Document};
+use futures_util::StreamExt;
 use mongodb::{Client, Collection};
 
 use crate::models::deck::Deck;
@@ -16,7 +21,29 @@ async fn post_deck(client: web::Data<Client>, Json(deck): web::Json<Deck>) -> Ht
     }
 }
 
-// TODO: #[get("/decks")]
+#[get("/decks/{user_id}")]
+pub async fn get_decks(client: web::Data<Client>, user_id: web::Path<String>) -> HttpResponse {
+    let database = client.database(DATABASE);
+    let collection = database.collection::<Deck>(DECKS);
+
+    let filter: Document = doc! { "user_id": user_id.to_string() };
+
+    match collection.find(filter).await {
+        Ok(mut cursor) => {
+            let mut decks: Vec<Deck> = Vec::new();
+            while let Some(result) = cursor.next().await {
+                match result {
+                    Ok(document) => decks.push(document),
+                    Err(err) => {
+                        return HttpResponse::InternalServerError().body(format!("Error: {}", err))
+                    }
+                }
+            }
+            HttpResponse::Ok().json(decks)
+        }
+        Err(err) => return HttpResponse::InternalServerError().body(format!("Error: {}", err)),
+    }
+}
 
 // TODO: #[get("/decks/{id}")]
 

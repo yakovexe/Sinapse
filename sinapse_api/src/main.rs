@@ -4,9 +4,10 @@ mod models;
 mod routes;
 mod utils;
 
+use routes::auth::post_user;
+use routes::decks::post_deck;
 use routes::flashcards::{get_flashcards, post_flashcard};
 use routes::index::index;
-use routes::users::post_user;
 use utils::db::get_database_client;
 
 // Bootstraps and initialize the application
@@ -26,6 +27,7 @@ async fn main() -> std::io::Result<()> {
             .service(get_flashcards)
             .service(post_flashcard)
             .service(post_user)
+            .service(post_deck)
     })
     .bind(("127.0.0.1", 8080))?
     .run()

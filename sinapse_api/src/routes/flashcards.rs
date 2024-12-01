@@ -28,7 +28,6 @@ pub async fn post_flashcard(
     }
 }
 
-// Solution based on https://stackoverflow.com/questions/67036017/how-to-get-collection-of-document-from-mongodb-cursor
 #[get("/flashcards/{deck_id}")]
 pub async fn get_flashcards(client: web::Data<Client>, deck_id: web::Path<String>) -> HttpResponse {
     let collection: Collection<Flashcard> = client.database(DATABASE).collection(FLASHCARDS);

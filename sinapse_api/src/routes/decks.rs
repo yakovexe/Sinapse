@@ -4,10 +4,9 @@ use actix_web::{
     HttpResponse,
 };
 use bson::{doc, Document};
-use futures_util::StreamExt;
 use mongodb::{Client, Collection};
 
-use crate::models::deck::Deck;
+use crate::{models::deck::Deck, utils::db::find_all_documents};
 
 const DATABASE: &str = "SinapseDB";
 const DECKS: &str = "decks";
@@ -23,24 +22,15 @@ async fn post_deck(client: web::Data<Client>, Json(deck): web::Json<Deck>) -> Ht
 
 #[get("/decks/{user_id}")]
 pub async fn get_decks(client: web::Data<Client>, user_id: web::Path<String>) -> HttpResponse {
-    let database = client.database(DATABASE);
-    let collection = database.collection::<Deck>(DECKS);
+    let collection: Collection<Deck> = client.database(DATABASE).collection(DECKS);
 
     let filter: Document = doc! { "user_id": user_id.to_string() };
 
-    match collection.find(filter).await {
-        Ok(mut cursor) => {
-            let mut decks: Vec<Deck> = Vec::new();
-            while let Some(result) = cursor.next().await {
-                match result {
-                    Ok(document) => decks.push(document),
-                    Err(err) => {
-                        return HttpResponse::InternalServerError().body(format!("Error: {}", err))
-                    }
-                }
-            }
-            HttpResponse::Ok().json(decks)
-        }
+    let result: Result<Vec<Deck>, mongodb::error::Error> =
+        find_all_documents(&collection, filter).await;
+
+    match result {
+        Ok(decks) => HttpResponse::Ok().json(decks),
         Err(err) => return HttpResponse::InternalServerError().body(format!("Error: {}", err)),
     }
 }

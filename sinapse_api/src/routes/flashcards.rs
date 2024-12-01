@@ -4,10 +4,10 @@ use actix_web::{
     HttpResponse,
 };
 use bson::{doc, Document};
-use futures_util::StreamExt;
 use mongodb::{Client, Collection};
 
 use crate::models::flashcard::Flashcard;
+use crate::utils::db::*;
 
 const DATABASE: &str = "SinapseDB";
 const FLASHCARDS: &str = "flashcards";
@@ -31,24 +31,15 @@ pub async fn post_flashcard(
 // Solution based on https://stackoverflow.com/questions/67036017/how-to-get-collection-of-document-from-mongodb-cursor
 #[get("/flashcards/{deck_id}")]
 pub async fn get_flashcards(client: web::Data<Client>, deck_id: web::Path<String>) -> HttpResponse {
-    let database = client.database(DATABASE);
-    let collection = database.collection::<Flashcard>(FLASHCARDS);
+    let collection: Collection<Flashcard> = client.database(DATABASE).collection(FLASHCARDS);
 
     let filter: Document = doc! { "deck_id": deck_id.to_string() };
 
-    match collection.find(filter).await {
-        Ok(mut cursor) => {
-            let mut flashcards: Vec<Flashcard> = Vec::new();
-            while let Some(result) = cursor.next().await {
-                match result {
-                    Ok(document) => flashcards.push(document),
-                    Err(err) => {
-                        return HttpResponse::InternalServerError().body(format!("Error: {}", err))
-                    }
-                }
-            }
-            HttpResponse::Ok().json(flashcards)
-        }
+    let result: Result<Vec<Flashcard>, mongodb::error::Error> =
+        find_all_documents(&collection, filter).await;
+
+    match result {
+        Ok(flashcards) => HttpResponse::Ok().json(flashcards),
         Err(err) => return HttpResponse::InternalServerError().body(format!("Error: {}", err)),
     }
 }

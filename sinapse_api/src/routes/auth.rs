@@ -14,7 +14,15 @@ async fn post_user(client: web::Data<Client>, Json(user): web::Json<User>) -> Ht
     }
     let collection: Collection<User> = client.database(DATABASE).collection(USERS);
     match collection.insert_one(user).await {
-        Ok(_) => HttpResponse::Created().body("User created!"),
+        Ok(result) => {
+            let user_id = result
+                .inserted_id
+                .as_object_id()
+                .unwrap()
+                .to_hex()
+                .to_string();
+            HttpResponse::Created().body(user_id)
+        }
         Err(err) => HttpResponse::InternalServerError().body(err.to_string()),
     }
 }

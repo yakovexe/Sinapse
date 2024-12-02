@@ -23,7 +23,15 @@ pub async fn post_flashcard(
     }
     let collection: Collection<Flashcard> = client.database(DATABASE).collection(FLASHCARDS);
     match collection.insert_one(flashcard).await {
-        Ok(_) => HttpResponse::Created().body("Flashcard created!"),
+        Ok(result) => {
+            let flashcard_id = result
+                .inserted_id
+                .as_object_id()
+                .unwrap()
+                .to_hex()
+                .to_string();
+            HttpResponse::Created().body(flashcard_id)
+        }
         Err(err) => HttpResponse::InternalServerError().body(err.to_string()),
     }
 }

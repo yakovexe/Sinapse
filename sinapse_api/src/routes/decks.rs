@@ -20,7 +20,15 @@ async fn post_deck(client: web::Data<Client>, Json(deck): web::Json<Deck>) -> Ht
     let collection: Collection<Deck> = client.database(DATABASE).collection(DECKS);
 
     match collection.insert_one(deck).await {
-        Ok(_) => HttpResponse::Created().body("Deck created!"),
+        Ok(result) => {
+            let deck_id = result
+                .inserted_id
+                .as_object_id()
+                .unwrap()
+                .to_hex()
+                .to_string();
+            HttpResponse::Created().body(deck_id)
+        }
         Err(err) => HttpResponse::InternalServerError().body(err.to_string()),
     }
 }

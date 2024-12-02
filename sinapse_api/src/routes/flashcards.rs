@@ -1,9 +1,11 @@
+use std::str::FromStr;
+
 use actix_web::{
-    get, post,
+    delete, get, post,
     web::{self, Json},
     HttpResponse,
 };
-use bson::{doc, Document};
+use bson::{doc, oid::ObjectId, Document};
 use mongodb::{Client, Collection};
 
 use crate::models::flashcard::Flashcard;
@@ -51,4 +53,26 @@ pub async fn get_flashcards(client: web::Data<Client>, deck_id: web::Path<String
     }
 }
 
-// TODO: #[delete("/flashcards/{id}")]
+#[delete("/flashcards/{flashcard_id}")]
+pub async fn delete_flashcard(
+    client: web::Data<Client>,
+    flashcard_id: web::Path<String>,
+) -> HttpResponse {
+    let collection: Collection<Flashcard> = client.database(DATABASE).collection(FLASHCARDS);
+
+    let object_id = match ObjectId::from_str(&flashcard_id) {
+        Ok(id) => id,
+        Err(err) => {
+            return HttpResponse::BadRequest().body(format!("Invalid ObjectId: {}", err));
+        }
+    };
+
+    let filter: Document = doc! { "_id":  object_id };
+
+    let result = collection.delete_one(filter).await;
+
+    match result {
+        Ok(_) => HttpResponse::Ok().body(flashcard_id.to_string()),
+        Err(err) => return HttpResponse::InternalServerError().body(format!("Error: {}", err)),
+    }
+}

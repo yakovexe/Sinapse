@@ -12,3 +12,8 @@ export interface CardProps {
   title: string;
   onClick: () => void;
 }
+
+export interface CreateModalProps {
+  onCreate: () => void;
+  onClose: () => void;
+}

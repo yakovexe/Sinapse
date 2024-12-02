@@ -1,11 +1,18 @@
-import { For, type Component } from "solid-js";
+import { createSignal, For, Show, type Component } from "solid-js";
 import FloatingButton from "../components/FloatingButton";
 import AddIcon from "../assets/misc/AddIcon";
 import Card from "../components/Card";
 import { useNavigate } from "@solidjs/router";
+import CreateDeckModal from "../components/CreateFlashcardModal";
 
 const CardsHome: Component = () => {
+  const [showModal, setShowModal] = createSignal(false);
+
   const navigate = useNavigate();
+
+  const handleCreateDeck = () => {
+    setShowModal(false);
+  };
 
   const cards = [
     {
@@ -29,6 +36,15 @@ const CardsHome: Component = () => {
           "linear-gradient(90deg, #F8F8FF calc(23px - 2px), transparent 1%) center / 23px 23px, linear-gradient(#F8F8FF calc(23px - 2px), transparent 1%) center / 23px 23px, #030001",
       }}
     >
+      <Show when={showModal()}>
+        <CreateDeckModal
+          onCreate={handleCreateDeck}
+          onClose={() => setShowModal(false)}
+        ></CreateDeckModal>
+      </Show>
+      <h1 class="mx-auto mt-4 w-48 bg-white text-center text-4xl font-bold">
+        Baralhos:
+      </h1>
       <div class="grid grid-cols-1 gap-6 rounded-md p-8 text-center md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
         <For each={cards} fallback={<p>Carregando...</p>}>
           {(card) => (
@@ -47,7 +63,7 @@ const CardsHome: Component = () => {
         <FloatingButton
           Icon={AddIcon}
           Text="Novo Baralho"
-          onClick={() => {}}
+          onClick={() => setShowModal(true)}
         ></FloatingButton>
       </div>
     </div>

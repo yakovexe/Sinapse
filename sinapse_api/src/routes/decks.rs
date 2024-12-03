@@ -49,7 +49,7 @@ pub async fn get_decks(client: web::Data<Client>, user_id: web::Path<String>) ->
     }
 }
 
-#[get("/decks/{deck_id}")]
+#[get("/deck/{deck_id}")]
 pub async fn get_deck(client: web::Data<Client>, deck_id: web::Path<String>) -> HttpResponse {
     let collection: Collection<Flashcard> = client.database(DATABASE).collection(FLASHCARDS);
 

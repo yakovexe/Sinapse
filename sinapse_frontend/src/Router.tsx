@@ -17,12 +17,16 @@ const RouterComponent = () => {
       {/* Private Routes */}
       <Route path="/" component={AuthGuard}>
         <Route
-          path="/cardshome"
-          component={lazy(() => import("./pages/CardsHome"))}
+          path="/decks"
+          component={lazy(() => import("./pages/Decks"))}
         ></Route>
         <Route
-          path="/deck/:id"
-          component={lazy(() => import("./pages/Deck"))}
+          path="/flashcards/:id"
+          component={lazy(() => import("./pages/Flashcards"))}
+        ></Route>
+        <Route
+          path="/play/:id"
+          component={lazy(() => import("./pages/Play"))}
         ></Route>
       </Route>
     </Router>

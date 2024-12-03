@@ -5,7 +5,7 @@ import Card from "../components/Card";
 import { useNavigate } from "@solidjs/router";
 import CreateDeckModal from "../components/CreateFlashcardModal";
 
-const CardsHome: Component = () => {
+const Decks: Component = () => {
   const [showModal, setShowModal] = createSignal(false);
 
   const navigate = useNavigate();
@@ -53,7 +53,7 @@ const CardsHome: Component = () => {
               title={card.name}
               text="Ver Baralho"
               onClick={() => {
-                navigate(`/deck/${card.id}`);
+                navigate(`/flashcards/${card.id}`);
               }}
             ></Card>
           )}
@@ -70,4 +70,4 @@ const CardsHome: Component = () => {
   );
 };
 
-export default CardsHome;
+export default Decks;

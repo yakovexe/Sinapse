@@ -5,7 +5,7 @@ const Card: Component<CardProps> = (props) => {
   return (
     <div
       onClick={props.onClick}
-      class="m-auto h-full w-80 rounded-md border-2 border-black bg-white hover:shadow-[8px_8px_0px_rgba(0,0,0,1)]"
+      class="m-auto h-full w-72 rounded-md border-2 border-black bg-white hover:shadow-[8px_8px_0px_rgba(0,0,0,1)]"
     >
       <div class="block h-full cursor-pointer">
         <article class="h-full w-full">

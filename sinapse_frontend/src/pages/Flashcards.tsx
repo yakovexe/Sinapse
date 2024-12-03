@@ -6,8 +6,11 @@ import Card from "../components/Card";
 import CardModal from "../components/CardModal";
 import { Flashcard } from "../models/flashcard";
 import CreateFlashcardModal from "../components/CreateFlashcardModal";
+import PlayIcon from "../assets/misc/PlayIcon";
 
-const Deck: Component = () => {
+const Flashcards: Component = () => {
+  const navigate = useNavigate();
+
   const [showFlashcardInfoModal, setShowFlashcardInfoModal] =
     createSignal(false);
   const [showCreateFlashcardModal, setShowCreateFlashcardModal] =
@@ -31,21 +34,21 @@ const Deck: Component = () => {
   const params = useParams();
   const cards: Flashcard[] = [
     {
-      id: 1,
-      deckId: 1,
+      id: 2,
+      deckId: 2,
       question: "Quem?",
       answer: "Eu",
     },
     {
       id: 2,
-      deckId: 1,
+      deckId: 2,
       question:
         "O que é? O que é? O que é? O que é?O que é? O que é? O que é? O que é? O que é? O que é? O que é?  O que é? O que é? O que é? O que é? O que é? O que é? O que é? O que é? O que é? O que é? O que é? O que é? O que é? O que é? O que é? O que é? O que é? O que é? O que é? O que é? O que é? O que é? O que é? O que é? ",
       answer: "Aquilo",
     },
     {
       id: 3,
-      deckId: 1,
+      deckId: 2,
       question: "Quando?",
       answer: "Agora",
     },
@@ -89,6 +92,13 @@ const Deck: Component = () => {
           )}
         </For>
       </div>
+      <div class="fixed bottom-24 right-4">
+        <FloatingButton
+          Icon={PlayIcon}
+          Text="Jogar Baralho"
+          onClick={() => navigate("/play/" + params.id)}
+        ></FloatingButton>
+      </div>
       <div class="fixed bottom-4 right-4">
         <FloatingButton
           Icon={AddIcon}
@@ -100,4 +110,4 @@ const Deck: Component = () => {
   );
 };
 
-export default Deck;
+export default Flashcards;

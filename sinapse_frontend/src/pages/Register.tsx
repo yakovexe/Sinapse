@@ -6,7 +6,7 @@ const Register: Component = () => {
 
   const handleLogin = () => {
     console.log("Login");
-    navigate("/cardshome");
+    navigate("/decks");
   };
 
   return (

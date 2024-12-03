@@ -5,7 +5,7 @@ const Login: Component = () => {
   const navigate = useNavigate();
   const handleLogin = () => {
     console.log("Login");
-    navigate("/cardshome");
+    navigate("/decks");
   };
 
   return (

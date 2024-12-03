@@ -5,7 +5,7 @@ mod routes;
 mod utils;
 
 use routes::auth::post_user;
-use routes::decks::{get_deck, get_decks, post_deck};
+use routes::decks::{delete_deck, get_deck, get_decks, post_deck};
 use routes::flashcards::{delete_flashcard, get_flashcards, post_flashcard};
 use routes::index::index;
 use utils::db::get_database_client;
@@ -24,13 +24,14 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .app_data(web::Data::new(client.clone()))
             .service(index)
-            .service(get_flashcards)
             .service(post_flashcard)
+            .service(get_flashcards)
             .service(delete_flashcard)
             .service(post_user)
             .service(post_deck)
             .service(get_deck)
             .service(get_decks)
+            .service(delete_deck)
     })
     .bind(("127.0.0.1", 8080))?
     .run()

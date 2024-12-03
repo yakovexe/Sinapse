@@ -1,10 +1,11 @@
 use actix_web::{
-    get, post,
+    delete, get, post,
     web::{self, Json},
     HttpResponse,
 };
-use bson::{doc, Document};
-use mongodb::{Client, Collection};
+use bson::{doc, oid::ObjectId, Document};
+use mongodb::{Client, Collection, Database};
+use std::str::FromStr;
 
 use crate::{
     models::{deck::Deck, flashcard::Flashcard},
@@ -63,4 +64,29 @@ pub async fn get_deck(client: web::Data<Client>, deck_id: web::Path<String>) -> 
     }
 }
 
-// TODO: #[delete("/decks/{id}")]
+#[delete("/decks/{deck_id}")]
+pub async fn delete_deck(client: web::Data<Client>, deck_id: web::Path<String>) -> HttpResponse {
+    let database: Database = client.database(DATABASE);
+    let decks: Collection<Deck> = database.collection(DECKS);
+    let flashcards: Collection<Flashcard> = database.collection(FLASHCARDS);
+
+    let object_id = match ObjectId::from_str(&deck_id) {
+        Ok(id) => id,
+        Err(err) => {
+            return HttpResponse::BadRequest().body(format!("Invalid ObjectId: {}", err));
+        }
+    };
+
+    match flashcards
+        .delete_many(doc! { "deck_id": deck_id.to_string() })
+        .await
+    {
+        Ok(result) => result,
+        Err(err) => return HttpResponse::InternalServerError().body(format!("Error: {}", err)),
+    };
+
+    match decks.delete_one(doc! { "_id":  object_id }).await {
+        Ok(_) => HttpResponse::Ok().body(deck_id.to_string()),
+        Err(err) => return HttpResponse::InternalServerError().body(format!("Error: {}", err)),
+    }
+}

@@ -1,3 +1,4 @@
+use actix_cors::Cors;
 use actix_web::{web, App, HttpServer};
 
 mod models;
@@ -21,7 +22,10 @@ async fn main() -> std::io::Result<()> {
     println!("Server running at http://127.0.0.1:8080");
 
     HttpServer::new(move || {
+        let cors = Cors::permissive();
+
         App::new()
+            .wrap(cors)
             .app_data(web::Data::new(client.clone()))
             .service(index)
             .service(post_flashcard)

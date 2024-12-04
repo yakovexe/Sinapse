@@ -1,12 +1,24 @@
 import { useNavigate } from "@solidjs/router";
 import type { Component } from "solid-js";
+import { UserService } from "../services/UserService";
 
 const Register: Component = () => {
   const navigate = useNavigate();
+  const userService = new UserService();
 
   const handleLogin = () => {
-    console.log("Login");
-    navigate("/cardshome");
+    const username = document.getElementById("username") as HTMLInputElement;
+    const password = document.getElementById("password") as HTMLInputElement;
+    const confirmPassword = document.getElementById(
+      "confirm-password",
+    ) as HTMLInputElement;
+
+    if (password.value == confirmPassword.value && username.value != "") {
+      userService.createUser(username.value, password.value).then((data) => {
+        localStorage.setItem("id", data.id);
+        navigate("/decks");
+      });
+    }
   };
 
   return (
@@ -20,14 +32,13 @@ const Register: Component = () => {
       <div class="flex flex-col gap-4 rounded-md bg-white p-12 text-center">
         <h1 class="text-2xl font-bold">Registrar</h1>
         <div class="flex flex-col gap-2 text-left">
-          <label for="email" class="text-lg font-semibold">
-            Email
+          <label for="username" class="text-lg font-semibold">
+            Nome de usuário
           </label>
           <input
-            id="email"
-            type="email"
+            id="username"
+            type="text"
             class="w-64 border-2 border-black p-2.5 focus:bg-gray-300 focus:shadow-[2px_2px_0px_rgba(0,0,0,1)] focus:outline-none active:shadow-[2px_2px_0px_rgba(0,0,0,1)]"
-            placeholder="email@exemplo.com"
           />
         </div>
 

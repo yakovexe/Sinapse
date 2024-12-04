@@ -1,11 +1,11 @@
-use std::{result, str::FromStr};
+use std::str::FromStr;
 
 use actix_web::{
     delete, get, post,
     web::{self, Json},
     HttpResponse,
 };
-use bson::{doc, document, oid::ObjectId, Document};
+use bson::{doc, oid::ObjectId, Document};
 use mongodb::{Client, Collection};
 
 use crate::models::flashcard::{Flashcard, ResponseFlashcard};

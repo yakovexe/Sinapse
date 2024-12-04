@@ -8,7 +8,10 @@ use mongodb::{Client, Collection, Database};
 use std::str::FromStr;
 
 use crate::{
-    models::{deck::Deck, flashcard::Flashcard},
+    models::{
+        deck::{Deck, ResponseDeck},
+        flashcard::Flashcard,
+    },
     utils::db::find_all_documents,
 };
 
@@ -36,15 +39,29 @@ async fn post_deck(client: web::Data<Client>, Json(deck): web::Json<Deck>) -> Ht
 
 #[get("/decks/{user_id}")]
 pub async fn get_decks(client: web::Data<Client>, user_id: web::Path<String>) -> HttpResponse {
-    let collection: Collection<Deck> = client.database(DATABASE).collection(DECKS);
+    let collection: Collection<Document> = client.database(DATABASE).collection(DECKS);
 
     let filter: Document = doc! { "user_id": user_id.to_string() };
 
-    let result: Result<Vec<Deck>, mongodb::error::Error> =
+    let result: Result<Vec<Document>, mongodb::error::Error> =
         find_all_documents(&collection, filter).await;
 
     match result {
-        Ok(decks) => HttpResponse::Ok().json(decks),
+        Ok(documents) => {
+            let response_decks: Vec<ResponseDeck> = documents
+                .iter()
+                .map(|doc| {
+                    let object_id = doc.get("_id").unwrap().as_object_id().unwrap();
+                    ResponseDeck {
+                        id: object_id.to_hex().to_string(),
+                        user_id: doc.get_str("user_id").unwrap().to_string(),
+                        name: doc.get_str("name").unwrap().to_string(),
+                    }
+                })
+                .collect();
+
+            HttpResponse::Ok().json(response_decks)
+        }
         Err(err) => return HttpResponse::InternalServerError().body(format!("Error: {}", err)),
     }
 }

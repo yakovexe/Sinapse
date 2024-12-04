@@ -25,8 +25,7 @@ export class FlashcardService {
         answer: answer,
       }),
     });
-    console.log(response);
-    // const data = await response.json();
-    // return data;
+    const data = await response.json();
+    return data;
   }
 }

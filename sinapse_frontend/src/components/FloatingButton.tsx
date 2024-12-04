@@ -1,6 +1,7 @@
 import { Component, Show } from "solid-js";
 import { FloatingButtonProps } from "../models/props";
 
+// Generic floating button
 const FloatingButton: Component<FloatingButtonProps> = (props) => {
   return (
     <div

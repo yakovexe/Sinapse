@@ -1,6 +1,7 @@
 import { Component } from "solid-js";
 import { CardProps } from "../models/props";
 
+// Base card for decks and flashcards
 const Card: Component<CardProps> = (props) => {
   return (
     <div

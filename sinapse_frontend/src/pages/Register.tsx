@@ -19,7 +19,6 @@ const Register: Component = () => {
         navigate("/decks");
       });
     }
-    // navigate("/decks");
   };
 
   return (

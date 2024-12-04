@@ -18,9 +18,9 @@ const Home: Component = () => {
 
   let pageLoaded = false;
 
+  // Ger random index from the cards array
   const getRandomCardIndex = () => {
     if (cardsInfo().length <= 0) {
-      console.log("fim");
       setCardsFinished(true);
       return -1;
     }
@@ -30,6 +30,7 @@ const Home: Component = () => {
     return randomIndex;
   };
 
+  // Sets random index as current card then removes it from the array
   const nextCard = () => {
     console.log("length", cardsInfo().length);
     if (cardsInfo().length <= 0) {
@@ -37,10 +38,8 @@ const Home: Component = () => {
       return;
     }
     const randomIndex = getRandomCardIndex();
-    console.log("a");
     if (randomIndex !== -1) {
       setShowAnswer(false);
-      console.log(cardsInfo()[randomIndex]);
       setCurrentCard(cardsInfo()[randomIndex]);
       cardsInfo().splice(randomIndex, 1);
     }
@@ -55,7 +54,6 @@ const Home: Component = () => {
       pageLoaded = true;
       deckService.getDeck(params.id).then((data) => {
         console.log(data);
-        const test = data;
         setCardsInfo(data);
         nextCard();
       });

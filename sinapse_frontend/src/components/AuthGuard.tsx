@@ -8,10 +8,12 @@ import {
   Show,
 } from "solid-js";
 
+// Verify if there is a user id in the localStorage
 async function verifyId() {
   return localStorage.getItem("id") !== null;
 }
 
+// Prevents users not authenticated from accessing private routes
 export function AuthGuard(props: ParentProps): JSX.Element {
   const [isAuthenticated, setIsAuthenticated] = createSignal(false);
   const navigate = useNavigate();
@@ -22,7 +24,6 @@ export function AuthGuard(props: ParentProps): JSX.Element {
     const auth = await verifyId();
     if (auth) {
       setIsAuthenticated(true);
-      console.log(`Authenticated: ${new Date()}`);
     } else {
       navigate("/login");
     }

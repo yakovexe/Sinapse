@@ -3,16 +3,11 @@ import { A, useLocation, useNavigate } from "@solidjs/router";
 
 const Header: Component = () => {
   const [isAuthenticated, setIsAuthenticated] = createSignal(false);
-  const [isPrivateRoute, setIsPrivateRoute] = createSignal(false);
   const navigate = useNavigate();
-  const location = useLocation();
 
+  // Verifies if the user is authenticated to only show him the logout button instead of the login and register buttons
   createEffect(() => {
     setIsAuthenticated(localStorage.getItem("id") !== null);
-    setIsPrivateRoute(
-      location.pathname.startsWith("/decks") ||
-        location.pathname.startsWith("/flashcards"),
-    );
   });
 
   const navItems = [

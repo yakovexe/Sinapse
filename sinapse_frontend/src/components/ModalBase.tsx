@@ -6,6 +6,7 @@ interface ModalProps {
   children: JSXElement;
 }
 
+// Base modal for Flashcard and Deck modals
 const ModalBase: Component<ModalProps> = (props) => {
   return (
     <div

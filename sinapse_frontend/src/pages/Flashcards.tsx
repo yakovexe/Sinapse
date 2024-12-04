@@ -10,7 +10,7 @@ import FloatingButton from "../components/FloatingButton";
 import AddIcon from "../assets/misc/AddIcon";
 import Card from "../components/Card";
 import CardModal from "../components/CardModal";
-import { Flashcard } from "../models/flashcard";
+import { FlashcardWithId } from "../models/flashcard";
 import CreateFlashcardModal from "../components/CreateFlashcardModal";
 import PlayIcon from "../assets/misc/PlayIcon";
 import { FlashcardService } from "../services/FlashcardService";
@@ -23,26 +23,28 @@ const Flashcards: Component = () => {
 
   const params = useParams();
 
-  const [flashcardsInfo, setFlashcardsInfo] = createSignal<Flashcard[]>([]);
+  const [flashcardsInfo, setFlashcardsInfo] = createSignal<FlashcardWithId[]>(
+    [],
+  );
 
   const [showFlashcardInfoModal, setShowFlashcardInfoModal] =
     createSignal(false);
   const [showCreateFlashcardModal, setShowCreateFlashcardModal] =
     createSignal(false);
-  const [modalValue, setModalValue] = createSignal<Flashcard>({
+
+  const [modalValue, setModalValue] = createSignal<FlashcardWithId>({
+    id: "",
     deck_id: "",
     question: "",
     answer: "",
   });
 
   createEffect(() => {
-    const id = "674f8cb82292973f2b95642";
     loadFlashcards();
   });
 
   const loadFlashcards = () => {
     flashcardService.getFlashcards(params.id).then((data) => {
-      console.log(data);
       setFlashcardsInfo(data);
     });
   };
@@ -57,12 +59,8 @@ const Flashcards: Component = () => {
     setShowCreateFlashcardModal(false);
   };
 
-  /**
-   * Opens a modal to display detailed information about a flashcard.
-   *
-   * @param card - The flashcard whose information is to be displayed.
-   */
-  const createModal = (card: Flashcard) => {
+  // Set modal values of the clicked flashcard then shows it
+  const createModal = (card: FlashcardWithId) => {
     setModalValue(card);
     setShowFlashcardInfoModal(true);
   };

@@ -3,3 +3,7 @@ export interface Flashcard {
   question: string;
   answer: string;
 }
+
+export interface FlashcardWithId extends Flashcard {
+  id: string;
+}

@@ -1,5 +1,5 @@
 import type { Component } from "solid-js";
-import { redirect, useNavigate } from "@solidjs/router";
+import { useNavigate } from "@solidjs/router";
 import { UserService } from "../services/UserService";
 
 const Login: Component = () => {

@@ -1,9 +1,9 @@
 import { Component } from "solid-js";
-import { Flashcard } from "../models/flashcard";
+import { FlashcardWithId } from "../models/flashcard";
 import ModalBase from "./ModalBase";
 
 interface CardModalProps {
-  card: Flashcard;
+  card: FlashcardWithId;
   onDelete: (id: string) => void;
   onClose: () => void;
 }

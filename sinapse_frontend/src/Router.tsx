@@ -9,11 +9,25 @@ const RouterComponent = () => {
       {/* Public Routes */}
       <Route path="/" component={lazy(() => import("./pages/Home"))}></Route>
       <Route path="/login" component={lazy(() => import("./pages/Login"))} />
-      <Route path="/register" component={lazy(() => import("./pages/Register"))} />
+      <Route
+        path="/register"
+        component={lazy(() => import("./pages/Register"))}
+      />
       <Route path="/about" component={lazy(() => import("./pages/About"))} />
       {/* Private Routes */}
       <Route path="/" component={AuthGuard}>
-         <Route path="/cardshome" component={lazy(() => import("./pages/CardsHome"))}></Route>
+        <Route
+          path="/decks"
+          component={lazy(() => import("./pages/Decks"))}
+        ></Route>
+        <Route
+          path="/flashcards/:id"
+          component={lazy(() => import("./pages/Flashcards"))}
+        ></Route>
+        <Route
+          path="/play/:id"
+          component={lazy(() => import("./pages/Play"))}
+        ></Route>
       </Route>
     </Router>
   );

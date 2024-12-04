@@ -1,11 +1,20 @@
 import type { Component } from "solid-js";
-import { redirect, useNavigate } from "@solidjs/router";
+import { useNavigate } from "@solidjs/router";
+import { UserService } from "../services/UserService";
 
 const Login: Component = () => {
   const navigate = useNavigate();
+  const userService = new UserService();
   const handleLogin = () => {
-    console.log("Login");
-    navigate("/cardshome");
+    const email = document.getElementById("email") as HTMLInputElement;
+    const password = document.getElementById("password") as HTMLInputElement;
+    userService
+      .loginUser(email.value, password.value)
+      .then((data) => {
+        localStorage.setItem("id", data.id);
+        navigate("/decks");
+      })
+      .catch((err) => console.log(err));
   };
 
   return (

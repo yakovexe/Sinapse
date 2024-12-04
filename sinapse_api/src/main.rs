@@ -1,16 +1,16 @@
+use actix_cors::Cors;
 use actix_web::{web, App, HttpServer};
 
 mod models;
 mod routes;
 mod utils;
 
-use routes::auth::post_user;
-use routes::decks::{get_deck, get_decks, post_deck};
-use routes::flashcards::{get_flashcards, post_flashcard};
+use routes::auth::{auth_user, get_user, post_user};
+use routes::decks::{delete_deck, get_deck, get_decks, post_deck};
+use routes::flashcards::{delete_flashcard, get_flashcards, post_flashcard};
 use routes::index::index;
 use utils::db::get_database_client;
 
-// Bootstraps and initialize the application
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     let uri = "mongodb://127.0.0.1:27017";
@@ -21,15 +21,22 @@ async fn main() -> std::io::Result<()> {
     println!("Server running at http://127.0.0.1:8080");
 
     HttpServer::new(move || {
+        let cors = Cors::permissive();
+
         App::new()
+            .wrap(cors)
             .app_data(web::Data::new(client.clone()))
             .service(index)
-            .service(get_flashcards)
             .service(post_flashcard)
+            .service(get_flashcards)
+            .service(delete_flashcard)
             .service(post_user)
+            .service(get_user)
+            .service(auth_user)
             .service(post_deck)
             .service(get_deck)
             .service(get_decks)
+            .service(delete_deck)
     })
     .bind(("127.0.0.1", 8080))?
     .run()

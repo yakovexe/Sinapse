@@ -13,7 +13,7 @@
 //!   - `answer`: Resposta do flashcard.
 //! - **Response**:
 //!   - `201 Created`: Retorna o `ID` do flashcard criado.
-//!   - `400 Bad Request`: Quando algum campo obrigatório está ausente.
+//!   - `400 Bad Request`: Quando algum campo obrigatório está ausente ou inválido.
 //!   - `500 Internal Server Error`: Erro durante a criação do flashcard.
 //!
 //! ---
@@ -36,13 +36,14 @@
 //!   - `flashcard_id`: Identificador do flashcard a ser excluído.
 //! - **Response**:
 //!   - `200 OK`: Flashcard excluído com sucesso.
-//!   - `400 Bad Request`: `flashcard_id` inválido.
+//!   - `400 Bad Request`: `flashcard_id` inválido (formato incorreto).
 //!   - `500 Internal Server Error`: Erro durante a exclusão.
 //!
 //! ## Constantes
 //!
 //! - `DATABASE`: Nome do banco de dados MongoDB (`SinapseDB`).
 //! - `FLASHCARDS`: Nome da coleção de flashcards (`flashcards`).
+//!
 
 use std::str::FromStr;
 
@@ -69,8 +70,8 @@ const FLASHCARDS: &str = "flashcards";
 ///
 /// # Retornos
 /// - `201 Created`: Flashcard criado.
-/// - `400 Bad Request`: Falha devido a campos obrigatórios ausentes.
-/// - `500 Internal Server Error`: Falha ao criar o flashcard.
+/// - `400 Bad Request`: Falha devido a campos obrigatórios ausentes ou inválidos (como um `deck_id` vazio, uma pergunta ou resposta vazia).
+/// - `500 Internal Server Error`: Falha ao criar o flashcard (erro no banco de dados).
 #[post("/flashcards")]
 pub async fn post_flashcard(
     client: web::Data<Client>,
@@ -103,7 +104,7 @@ pub async fn post_flashcard(
 ///
 /// # Retornos
 /// - `200 OK`: Lista de flashcards.
-/// - `500 Internal Server Error`: Falha ao buscar flashcards.
+/// - `500 Internal Server Error`: Falha ao buscar flashcards (erro no banco de dados).
 #[get("/flashcards/{deck_id}")]
 pub async fn get_flashcards(client: web::Data<Client>, deck_id: web::Path<String>) -> HttpResponse {
     let collection: Collection<Document> = client.database(DATABASE).collection(FLASHCARDS);
@@ -142,8 +143,8 @@ pub async fn get_flashcards(client: web::Data<Client>, deck_id: web::Path<String
 ///
 /// # Retornos
 /// - `200 OK`: Flashcard excluído.
-/// - `400 Bad Request`: ID inválido.
-/// - `500 Internal Server Error`: Falha ao excluir o flashcard.
+/// - `400 Bad Request`: ID inválido (formato incorreto do `flashcard_id`).
+/// - `500 Internal Server Error`: Falha ao excluir o flashcard (erro no banco de dados).
 #[delete("/flashcards/{flashcard_id}")]
 pub async fn delete_flashcard(
     client: web::Data<Client>,

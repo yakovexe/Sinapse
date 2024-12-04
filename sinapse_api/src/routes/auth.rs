@@ -24,6 +24,15 @@
 //!   - `400 Bad Request`: Quando o `ID` fornecido é inválido.
 //!   - `500 Internal Server Error`: Quando ocorre um erro interno.
 //!
+//! ### `POST /users/auth`
+//! Realiza a autenticação de um usuário com base no `username` e `password`.
+//!
+//! - **Request Body**: Um objeto JSON representando o usuário contendo `username` e `password`.
+//! - **Response**:
+//!   - `200 OK`: Retorna o `ID` do usuário autenticado.
+//!   - `404 Not Found`: Quando o usuário não é encontrado.
+//!   - `500 Internal Server Error`: Quando ocorre um erro interno, como falha ao acessar o banco de dados ou recuperar o `ObjectId`.
+//!
 //! ## Constantes
 //!
 //! - `DATABASE`: Nome do banco de dados MongoDB utilizado (`SinapseDB`).
@@ -82,8 +91,8 @@ async fn post_user(client: web::Data<Client>, Json(user): web::Json<User>) -> Ht
 /// # Retornos
 /// - `200 OK`: Se o usuário for encontrado.
 /// - `404 Not Found`: Se o usuário não for encontrado.
-/// - `400 Bad Request`: Se o `ID` for inválido.
-/// - `500 Internal Server Error`: Se ocorrer um erro.
+/// - `400 Bad Request`: Quando o `ID` fornecido for inválido.
+/// - `500 Internal Server Error`: Quando ocorre um erro.
 #[get("/users/{user_id}")]
 pub async fn get_user(client: web::Data<Client>, user_id: web::Path<String>) -> HttpResponse {
     let collection: Collection<User> = client.database(DATABASE).collection(USERS);
@@ -110,6 +119,16 @@ pub async fn get_user(client: web::Data<Client>, user_id: web::Path<String>) -> 
     }
 }
 
+/// Realiza a autenticação de um usuário com base no `username` e `password`.
+///
+/// # Parâmetros
+/// - `client`: Instância do cliente MongoDB.
+/// - `user`: Objeto JSON contendo `username` e `password`.
+///
+/// # Retornos
+/// - `200 OK`: Se o usuário for autenticado com sucesso, retornando o `ID` do usuário.
+/// - `404 Not Found`: Quando o usuário não for encontrado.
+/// - `500 Internal Server Error`: Quando ocorre um erro interno, como falha ao acessar o banco de dados ou recuperar o `ObjectId`.
 #[post("/users/auth")]
 pub async fn auth_user(client: web::Data<Client>, Json(user): web::Json<User>) -> HttpResponse {
     let collection: Collection<Document> = client.database(DATABASE).collection(USERS);

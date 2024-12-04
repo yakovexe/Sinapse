@@ -1,7 +1,12 @@
 import { A } from "@solidjs/router";
-import type { Component } from "solid-js";
+import { createEffect, createSignal, type Component } from "solid-js";
 
 const Home: Component = () => {
+  const [isAuthenticated, setIsAuthenticated] = createSignal(false);
+  createEffect(() => {
+    setIsAuthenticated(localStorage.getItem("id") !== null);
+  });
+
   return (
     <div
       class="flex h-full w-full flex-col items-center justify-center"
@@ -14,7 +19,7 @@ const Home: Component = () => {
         <h1 class="mb-4 text-6xl font-bold text-black">Sinapse</h1>
         <p class="mb-8 text-lg text-gray-600">Aprenda com flashcards</p>
         <A
-          href="/register"
+          href={isAuthenticated() ? "/decks" : "/register"}
           class="h-12 border-2 border-black bg-[#FDFFF7] p-2.5 hover:bg-gray-200 hover:shadow-[2px_2px_0px_rgba(0,0,0,1)]"
         >
           Comece Agora!

@@ -1,5 +1,11 @@
 import { useNavigate, useParams } from "@solidjs/router";
-import { createSignal, For, Show, type Component } from "solid-js";
+import {
+  createEffect,
+  createSignal,
+  For,
+  Show,
+  type Component,
+} from "solid-js";
 import FloatingButton from "../components/FloatingButton";
 import AddIcon from "../assets/misc/AddIcon";
 import Card from "../components/Card";
@@ -7,52 +13,71 @@ import CardModal from "../components/CardModal";
 import { Flashcard } from "../models/flashcard";
 import CreateFlashcardModal from "../components/CreateFlashcardModal";
 import PlayIcon from "../assets/misc/PlayIcon";
+import { FlashcardService } from "../services/FlashcardService";
+import { DeckService } from "../services/DeckService";
 
 const Flashcards: Component = () => {
   const navigate = useNavigate();
+  const flashcardService = new FlashcardService();
+  const deckService = new DeckService();
+
+  const params = useParams();
+
+  const [flashcardsInfo, setFlashcardsInfo] = createSignal<Flashcard[]>([]);
 
   const [showFlashcardInfoModal, setShowFlashcardInfoModal] =
     createSignal(false);
   const [showCreateFlashcardModal, setShowCreateFlashcardModal] =
     createSignal(false);
   const [modalValue, setModalValue] = createSignal<Flashcard>({
-    id: 0,
-    deckId: 0,
+    deck_id: "",
     question: "",
     answer: "",
   });
 
-  const handleCreateFlashcard = () => {
+  createEffect(() => {
+    const id = "674f8cb82292973f2b95642";
+    loadFlashcards();
+  });
+
+  const loadFlashcards = () => {
+    flashcardService.getFlashcards(params.id).then((data) => {
+      console.log(data);
+      setFlashcardsInfo(data);
+    });
+  };
+
+  const handleCreateFlashcard = (question: string, answer: string) => {
+    console.log(question, answer);
+    flashcardService
+      .createFlashcard(params.id, question, answer)
+      .then((data) => {
+        window.location.href = `/flashcards/${params.id}`;
+      });
     setShowCreateFlashcardModal(false);
   };
 
+  /**
+   * Opens a modal to display detailed information about a flashcard.
+   *
+   * @param card - The flashcard whose information is to be displayed.
+   */
   const createModal = (card: Flashcard) => {
     setModalValue(card);
     setShowFlashcardInfoModal(true);
   };
 
-  const params = useParams();
-  const cards: Flashcard[] = [
-    {
-      id: 2,
-      deckId: 2,
-      question: "Quem?",
-      answer: "Eu",
-    },
-    {
-      id: 2,
-      deckId: 2,
-      question:
-        "O que é? O que é? O que é? O que é?O que é? O que é? O que é? O que é? O que é? O que é? O que é?  O que é? O que é? O que é? O que é? O que é? O que é? O que é? O que é? O que é? O que é? O que é? O que é? O que é? O que é? O que é? O que é? O que é? O que é? O que é? O que é? O que é? O que é? O que é? O que é? ",
-      answer: "Aquilo",
-    },
-    {
-      id: 3,
-      deckId: 2,
-      question: "Quando?",
-      answer: "Agora",
-    },
-  ];
+  const handleDeleteFlashcard = (id: string) => {
+    flashcardService.deleteFlashcard(id).then((data) => {
+      window.location.href = `/flashcards/${params.id}`;
+    });
+  };
+
+  const handleDeleteDeck = () => {
+    deckService
+      .deleteDeck(params.id)
+      .then((data) => (window.location.href = `/decks`));
+  };
 
   return (
     <div
@@ -65,25 +90,32 @@ const Flashcards: Component = () => {
       <Show when={showFlashcardInfoModal()}>
         <CardModal
           card={modalValue()}
-          onDelete={() => {}}
+          onDelete={(id) => handleDeleteFlashcard(id)}
           onClose={() => setShowFlashcardInfoModal(false)}
         ></CardModal>
       </Show>
       <Show when={showCreateFlashcardModal()}>
         <CreateFlashcardModal
           onClose={() => setShowCreateFlashcardModal(false)}
-          onCreate={handleCreateFlashcard}
+          onCreate={(q, a) => handleCreateFlashcard(q, a)}
         ></CreateFlashcardModal>
       </Show>
       <h1 class="mx-auto mt-4 w-56 bg-white text-center text-4xl font-bold">
         Flashcards:
       </h1>
       <div class="grid grid-cols-1 gap-4 rounded-md p-8 text-center md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-        <For each={cards} fallback={<p>Carregando...</p>}>
-          {(card) => (
+        <For
+          each={flashcardsInfo()}
+          fallback={
+            <p class="bold relative left-0 bg-white text-center text-2xl md:left-1/2 xl:left-full">
+              Sem Flashcards. Crie algum!
+            </p>
+          }
+        >
+          {(card, index) => (
             <>
               <Card
-                id={card.id}
+                id={index.toString()}
                 title={card.question}
                 text="Ver Flashcard"
                 onClick={() => createModal(card)}
@@ -92,13 +124,22 @@ const Flashcards: Component = () => {
           )}
         </For>
       </div>
-      <div class="fixed bottom-24 right-4">
-        <FloatingButton
-          Icon={PlayIcon}
-          Text="Jogar Baralho"
-          onClick={() => navigate("/play/" + params.id)}
-        ></FloatingButton>
-      </div>
+      <button
+        onClick={() => handleDeleteDeck()}
+        class="mx-auto mb-8 mt-8 block h-12 border-2 border-black bg-black p-2.5 text-white hover:bg-gray-700 hover:shadow-[2px_2px_0px_rgba(0,0,0,1)]"
+      >
+        Deletar Baralho
+      </button>
+
+      <Show when={flashcardsInfo().length > 0}>
+        <div class="fixed bottom-24 right-4">
+          <FloatingButton
+            Icon={PlayIcon}
+            Text="Jogar Baralho"
+            onClick={() => navigate("/play/" + params.id)}
+          ></FloatingButton>
+        </div>
+      </Show>
       <div class="fixed bottom-4 right-4">
         <FloatingButton
           Icon={AddIcon}

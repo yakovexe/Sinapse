@@ -7,13 +7,18 @@ export interface FloatingButtonProps {
 }
 
 export interface CardProps {
-  id: number;
+  id: string;
   text: string;
   title: string;
   onClick: () => void;
 }
 
-export interface CreateModalProps {
-  onCreate: () => void;
+export interface CreateDeckProps {
+  onCreate: (name: string) => void;
+  onClose: () => void;
+}
+
+export interface CreateFlashcardProps {
+  onCreate: (question: string, answer: string) => void;
   onClose: () => void;
 }

@@ -1,64 +1,48 @@
-import { A } from "@solidjs/router";
+import { A, useParams } from "@solidjs/router";
 import { createEffect, createSignal, Show, type Component } from "solid-js";
 import { Flashcard } from "../models/flashcard";
+import { DeckService } from "../services/DeckService";
 
 const Home: Component = () => {
+  const deckService = new DeckService();
+  const params = useParams();
+
   const [currentCard, setCurrentCard] = createSignal<Flashcard>({
-    id: 0,
-    deckId: 0,
+    deck_id: "",
     question: "",
     answer: "",
   });
   const [showAnswer, setShowAnswer] = createSignal(false);
+  const [cardsInfo, setCardsInfo] = createSignal<Flashcard[]>([]);
   const [cardsFinished, setCardsFinished] = createSignal(false);
 
   let pageLoaded = false;
 
-  const cards: Flashcard[] = [
-    {
-      id: 2,
-      deckId: 2,
-      question: "Quem?",
-      answer: "Eu",
-    },
-    {
-      id: 2,
-      deckId: 2,
-      question:
-        "O que é? O que é? O que é? O que é?O que é? O que é? O que é? O que é? O que é? O que é? O que é?  O que é? O que é? O que é? O que é? O que é? O que é? O que é? O que é? O que é? O que é? O que é? O que é? O que é? O que é? O que é? O que é? O que é? O que é? O que é? O que é? O que é? O que é? O que é? O que é? ",
-      answer: "Aquilo",
-    },
-    {
-      id: 3,
-      deckId: 2,
-      question: "Quando?",
-      answer: "Agora",
-    },
-  ];
-
   const getRandomCardIndex = () => {
-    if (cards.length <= 0) {
+    if (cardsInfo().length <= 0) {
       console.log("fim");
       setCardsFinished(true);
       return -1;
     }
 
-    const randomIndex = Math.floor(Math.random() * cards.length);
+    const randomIndex = Math.floor(Math.random() * cardsInfo().length);
 
-    console.log("random", randomIndex);
     return randomIndex;
   };
 
   const nextCard = () => {
-    if (cards.length <= 0) {
+    console.log("length", cardsInfo().length);
+    if (cardsInfo().length <= 0) {
       setCardsFinished(true);
       return;
     }
     const randomIndex = getRandomCardIndex();
+    console.log("a");
     if (randomIndex !== -1) {
       setShowAnswer(false);
-      setCurrentCard(cards[randomIndex]);
-      cards.splice(randomIndex, 1);
+      console.log(cardsInfo()[randomIndex]);
+      setCurrentCard(cardsInfo()[randomIndex]);
+      cardsInfo().splice(randomIndex, 1);
     }
   };
 
@@ -69,7 +53,12 @@ const Home: Component = () => {
   createEffect(() => {
     if (!pageLoaded) {
       pageLoaded = true;
-      nextCard();
+      deckService.getDeck(params.id).then((data) => {
+        console.log(data);
+        const test = data;
+        setCardsInfo(data);
+        nextCard();
+      });
     }
   });
 
@@ -90,7 +79,7 @@ const Home: Component = () => {
                 Você Completou Todos os Flashcards!
               </p>
               <A
-                href="/"
+                href="/decks"
                 class="text-md h-12 border-2 border-black bg-[#FDFFF7] p-2.5 hover:bg-gray-200 hover:shadow-[2px_2px_0px_rgba(0,0,0,1)]"
               >
                 Voltar à pagina de decks

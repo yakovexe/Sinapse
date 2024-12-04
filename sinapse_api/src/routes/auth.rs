@@ -1,6 +1,11 @@
+use std::str::FromStr;
+
 use actix_web::web::{self, Json};
-use actix_web::{post, HttpResponse};
+use actix_web::{get, post, HttpResponse};
+use bson::oid::ObjectId;
+use bson::{doc, Document};
 use mongodb::{Client, Collection};
+use serde_json::json;
 
 use crate::models::user::User;
 
@@ -27,4 +32,28 @@ async fn post_user(client: web::Data<Client>, Json(user): web::Json<User>) -> Ht
     }
 }
 
-// TODO: #[get("/users/{id}")]
+#[get("/users/{user_id}")]
+pub async fn get_user(client: web::Data<Client>, user_id: web::Path<String>) -> HttpResponse {
+    let collection: Collection<User> = client.database(DATABASE).collection(USERS);
+
+    let object_id = match ObjectId::from_str(&user_id) {
+        Ok(id) => id,
+        Err(err) => {
+            return HttpResponse::BadRequest().body(format!("Invalid ObjectId: {}", err));
+        }
+    };
+
+    let filter: Document = doc! { "_id": object_id };
+
+    match collection.find_one(filter).await {
+        Ok(Some(user)) => {
+            let value = json!({
+                "id": object_id.to_string(),
+                "username": user.username,
+            });
+            HttpResponse::Ok().json(value)
+        }
+        Ok(None) => HttpResponse::NotFound().body("User not found"),
+        Err(err) => HttpResponse::InternalServerError().body(format!("Error: {}", err)),
+    }
+}

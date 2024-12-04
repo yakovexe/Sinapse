@@ -5,7 +5,7 @@ mod models;
 mod routes;
 mod utils;
 
-use routes::auth::post_user;
+use routes::auth::{get_user, post_user};
 use routes::decks::{delete_deck, get_deck, get_decks, post_deck};
 use routes::flashcards::{delete_flashcard, get_flashcards, post_flashcard};
 use routes::index::index;
@@ -32,6 +32,7 @@ async fn main() -> std::io::Result<()> {
             .service(get_flashcards)
             .service(delete_flashcard)
             .service(post_user)
+            .service(get_user)
             .service(post_deck)
             .service(get_deck)
             .service(get_decks)

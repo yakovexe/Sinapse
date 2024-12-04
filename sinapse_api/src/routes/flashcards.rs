@@ -1,3 +1,49 @@
+//! # API de Flashcards com Actix-Web e MongoDB
+//!
+//! Este módulo implementa uma API REST para gerenciar flashcards utilizando **Actix-Web** e **MongoDB**.
+//!
+//! ## Endpoints
+//!
+//! ### `POST /flashcards`
+//! Cria um novo flashcard no banco de dados.
+//!
+//! - **Request Body**: JSON representando o flashcard com os seguintes campos obrigatórios:
+//!   - `deck_id`: Identificador do deck associado.
+//!   - `question`: Pergunta do flashcard.
+//!   - `answer`: Resposta do flashcard.
+//! - **Response**:
+//!   - `201 Created`: Retorna o `ID` do flashcard criado.
+//!   - `400 Bad Request`: Quando algum campo obrigatório está ausente.
+//!   - `500 Internal Server Error`: Erro durante a criação do flashcard.
+//!
+//! ---
+//!
+//! ### `GET /flashcards/{deck_id}`
+//! Retorna todos os flashcards de um deck específico.
+//!
+//! - **Parâmetros**:
+//!   - `deck_id`: Identificador do deck.
+//! - **Response**:
+//!   - `200 OK`: Lista de flashcards associados ao `deck_id`.
+//!   - `500 Internal Server Error`: Erro ao buscar flashcards.
+//!
+//! ---
+//!
+//! ### `DELETE /flashcards/{flashcard_id}`
+//! Exclui um flashcard específico do banco de dados.
+//!
+//! - **Parâmetros**:
+//!   - `flashcard_id`: Identificador do flashcard a ser excluído.
+//! - **Response**:
+//!   - `200 OK`: Flashcard excluído com sucesso.
+//!   - `400 Bad Request`: `flashcard_id` inválido.
+//!   - `500 Internal Server Error`: Erro durante a exclusão.
+//!
+//! ## Constantes
+//!
+//! - `DATABASE`: Nome do banco de dados MongoDB (`SinapseDB`).
+//! - `FLASHCARDS`: Nome da coleção de flashcards (`flashcards`).
+
 use std::str::FromStr;
 
 use actix_web::{
@@ -14,6 +60,16 @@ use crate::utils::db::*;
 const DATABASE: &str = "SinapseDB";
 const FLASHCARDS: &str = "flashcards";
 
+/// Cria um novo flashcard no banco de dados.
+///
+/// # Parâmetros
+/// - `client`: Instância do cliente MongoDB.
+/// - `flashcard`: Objeto JSON representando o flashcard.
+///
+/// # Retornos
+/// - `201 Created`: Flashcard criado.
+/// - `400 Bad Request`: Falha devido a campos obrigatórios ausentes.
+/// - `500 Internal Server Error`: Falha ao criar o flashcard.
 #[post("/flashcards")]
 pub async fn post_flashcard(
     client: web::Data<Client>,
@@ -38,6 +94,15 @@ pub async fn post_flashcard(
     }
 }
 
+/// Retorna todos os flashcards de um deck.
+///
+/// # Parâmetros
+/// - `client`: Instância do cliente MongoDB.
+/// - `deck_id`: ID do deck.
+///
+/// # Retornos
+/// - `200 OK`: Lista de flashcards.
+/// - `500 Internal Server Error`: Falha ao buscar flashcards.
 #[get("/flashcards/{deck_id}")]
 pub async fn get_flashcards(client: web::Data<Client>, deck_id: web::Path<String>) -> HttpResponse {
     let collection: Collection<Document> = client.database(DATABASE).collection(FLASHCARDS);
@@ -64,10 +129,20 @@ pub async fn get_flashcards(client: web::Data<Client>, deck_id: web::Path<String
 
             HttpResponse::Ok().json(response_flashcards)
         }
-        Err(err) => return HttpResponse::InternalServerError().body(format!("Error: {}", err)),
+        Err(err) => HttpResponse::InternalServerError().body(format!("Error: {}", err)),
     }
 }
 
+/// Exclui um flashcard específico.
+///
+/// # Parâmetros
+/// - `client`: Instância do cliente MongoDB.
+/// - `flashcard_id`: ID do flashcard.
+///
+/// # Retornos
+/// - `200 OK`: Flashcard excluído.
+/// - `400 Bad Request`: ID inválido.
+/// - `500 Internal Server Error`: Falha ao excluir o flashcard.
 #[delete("/flashcards/{flashcard_id}")]
 pub async fn delete_flashcard(
     client: web::Data<Client>,
@@ -88,6 +163,6 @@ pub async fn delete_flashcard(
 
     match result {
         Ok(_) => HttpResponse::Ok().body(flashcard_id.to_string()),
-        Err(err) => return HttpResponse::InternalServerError().body(format!("Error: {}", err)),
+        Err(err) => HttpResponse::InternalServerError().body(format!("Error: {}", err)),
     }
 }

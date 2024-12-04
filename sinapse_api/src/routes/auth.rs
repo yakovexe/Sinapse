@@ -1,3 +1,34 @@
+//! # API de Usuários com Actix-Web e MongoDB
+//!
+//! Este módulo implementa uma API para gerenciamento de usuários utilizando o framework Actix-Web e o MongoDB como banco de dados.
+//!
+//! ## Endpoints
+//!
+//! ### `POST /users`
+//! Insere um novo usuário no banco de dados.
+//!
+//! - **Request Body**: Um objeto JSON representando o usuário contendo `username` e `password`.
+//! - **Response**:
+//!   - `201 Created`: Retorna o `ID` do usuário criado.
+//!   - `400 Bad Request`: Quando o `username` ou `password` estão ausentes.
+//!   - `500 Internal Server Error`: Quando ocorre um erro interno.
+//!
+//! ### `GET /users/{user_id}`
+//! Retorna um usuário pelo seu `ID`.
+//!
+//! - **Parâmetros**:
+//!   - `user_id`: O `ObjectId` do usuário no MongoDB.
+//! - **Response**:
+//!   - `200 OK`: Retorna o `username` e o `ID` do usuário encontrado.
+//!   - `404 Not Found`: Quando o usuário não é encontrado.
+//!   - `400 Bad Request`: Quando o `ID` fornecido é inválido.
+//!   - `500 Internal Server Error`: Quando ocorre um erro interno.
+//!
+//! ## Constantes
+//!
+//! - `DATABASE`: Nome do banco de dados MongoDB utilizado (`SinapseDB`).
+//! - `USERS`: Nome da coleção de usuários (`users`).
+//!
 use std::str::FromStr;
 
 use actix_web::web::{self, Json};
@@ -12,6 +43,16 @@ use crate::models::user::User;
 const DATABASE: &str = "SinapseDB";
 const USERS: &str = "users";
 
+/// Insere um novo usuário no banco de dados.
+///
+/// # Parâmetros
+/// - `client`: Instância do cliente MongoDB.
+/// - `user`: Objeto JSON contendo `username` e `password`.
+///
+/// # Retornos
+/// - `201 Created`: Se o usuário for criado com sucesso.
+/// - `400 Bad Request`: Se o `username` ou `password` forem vazios.
+/// - `500 Internal Server Error`: Se ocorrer um erro.
 #[post("/users")]
 async fn post_user(client: web::Data<Client>, Json(user): web::Json<User>) -> HttpResponse {
     if user.password.is_empty() || user.username.is_empty() {
@@ -32,6 +73,17 @@ async fn post_user(client: web::Data<Client>, Json(user): web::Json<User>) -> Ht
     }
 }
 
+/// Retorna informações de um usuário pelo seu `ID`.
+///
+/// # Parâmetros
+/// - `client`: Instância do cliente MongoDB.
+/// - `user_id`: `ID` do usuário no MongoDB.
+///
+/// # Retornos
+/// - `200 OK`: Se o usuário for encontrado.
+/// - `404 Not Found`: Se o usuário não for encontrado.
+/// - `400 Bad Request`: Se o `ID` for inválido.
+/// - `500 Internal Server Error`: Se ocorrer um erro.
 #[get("/users/{user_id}")]
 pub async fn get_user(client: web::Data<Client>, user_id: web::Path<String>) -> HttpResponse {
     let collection: Collection<User> = client.database(DATABASE).collection(USERS);

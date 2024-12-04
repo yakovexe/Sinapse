@@ -11,7 +11,6 @@ use routes::flashcards::{delete_flashcard, get_flashcards, post_flashcard};
 use routes::index::index;
 use utils::db::get_database_client;
 
-// Bootstraps and initialize the application
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     let uri = "mongodb://127.0.0.1:27017";

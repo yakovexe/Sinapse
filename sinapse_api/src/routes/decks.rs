@@ -1,3 +1,57 @@
+//! # API de Decks e Flashcards com Actix-Web e MongoDB
+//!
+//! Este módulo implementa endpoints para gerenciar **decks** e **flashcards** utilizando **Actix-Web** e **MongoDB**.
+//!
+//! ## Endpoints
+//!
+//! ### `POST /decks`
+//! Cria um novo deck no banco de dados.
+//!
+//! - **Request Body**: JSON representando o deck com campos necessários (ex.: `name`, `user_id`).
+//! - **Response**:
+//!   - `201 Created`: Retorna o `ID` do deck criado.
+//!   - `500 Internal Server Error`: Erro durante a criação do deck.
+//!
+//! ---
+//!
+//! ### `GET /decks/{user_id}`
+//! Retorna todos os decks associados a um usuário específico.
+//!
+//! - **Parâmetros**:
+//!   - `user_id`: O identificador do usuário.
+//! - **Response**:
+//!   - `200 OK`: Retorna uma lista de decks associados ao `user_id`.
+//!   - `500 Internal Server Error`: Erro ao buscar decks.
+//!
+//! ---
+//!
+//! ### `GET /deck/{deck_id}`
+//! Retorna todos os flashcards de um deck específico.
+//!
+//! - **Parâmetros**:
+//!   - `deck_id`: O identificador do deck.
+//! - **Response**:
+//!   - `200 OK`: Retorna uma lista de flashcards pertencentes ao deck.
+//!   - `500 Internal Server Error`: Erro ao buscar flashcards.
+//!
+//! ---
+//!
+//! ### `DELETE /decks/{deck_id}`
+//! Exclui um deck e seus flashcards associados do banco de dados.
+//!
+//! - **Parâmetros**:
+//!   - `deck_id`: O identificador do deck a ser excluído.
+//! - **Response**:
+//!   - `200 OK`: Deck e seus flashcards excluídos com sucesso.
+//!   - `400 Bad Request`: `deck_id` inválido.
+//!   - `500 Internal Server Error`: Erro durante a exclusão.
+//!
+//! ## Constantes
+//!
+//! - `DATABASE`: Nome do banco de dados MongoDB (`SinapseDB`).
+//! - `DECKS`: Nome da coleção de decks (`decks`).
+//! - `FLASHCARDS`: Nome da coleção de flashcards (`flashcards`).
+
 use actix_web::{
     delete, get, post,
     web::{self, Json},
@@ -19,6 +73,15 @@ const DATABASE: &str = "SinapseDB";
 const DECKS: &str = "decks";
 const FLASHCARDS: &str = "flashcards";
 
+/// Cria um novo deck no banco de dados.
+///
+/// # Parâmetros
+/// - `client`: Instância do cliente MongoDB.
+/// - `deck`: Objeto JSON representando o deck.
+///
+/// # Retornos
+/// - `201 Created`: Deck criado.
+/// - `500 Internal Server Error`: Falha ao criar o deck.
 #[post("/decks")]
 async fn post_deck(client: web::Data<Client>, Json(deck): web::Json<Deck>) -> HttpResponse {
     let collection: Collection<Deck> = client.database(DATABASE).collection(DECKS);
@@ -37,6 +100,15 @@ async fn post_deck(client: web::Data<Client>, Json(deck): web::Json<Deck>) -> Ht
     }
 }
 
+/// Retorna todos os decks de um usuário.
+///
+/// # Parâmetros
+/// - `client`: Instância do cliente MongoDB.
+/// - `user_id`: ID do usuário.
+///
+/// # Retornos
+/// - `200 OK`: Lista de decks.
+/// - `500 Internal Server Error`: Falha ao buscar decks.
 #[get("/decks/{user_id}")]
 pub async fn get_decks(client: web::Data<Client>, user_id: web::Path<String>) -> HttpResponse {
     let collection: Collection<Document> = client.database(DATABASE).collection(DECKS);
@@ -62,10 +134,19 @@ pub async fn get_decks(client: web::Data<Client>, user_id: web::Path<String>) ->
 
             HttpResponse::Ok().json(response_decks)
         }
-        Err(err) => return HttpResponse::InternalServerError().body(format!("Error: {}", err)),
+        Err(err) => HttpResponse::InternalServerError().body(format!("Error: {}", err)),
     }
 }
 
+/// Retorna todos os flashcards de um deck.
+///
+/// # Parâmetros
+/// - `client`: Instância do cliente MongoDB.
+/// - `deck_id`: ID do deck.
+///
+/// # Retornos
+/// - `200 OK`: Lista de flashcards.
+/// - `500 Internal Server Error`: Falha ao buscar flashcards.
 #[get("/deck/{deck_id}")]
 pub async fn get_deck(client: web::Data<Client>, deck_id: web::Path<String>) -> HttpResponse {
     let collection: Collection<Flashcard> = client.database(DATABASE).collection(FLASHCARDS);
@@ -77,10 +158,20 @@ pub async fn get_deck(client: web::Data<Client>, deck_id: web::Path<String>) -> 
 
     match result {
         Ok(flashcards) => HttpResponse::Ok().json(flashcards),
-        Err(err) => return HttpResponse::InternalServerError().body(format!("Error: {}", err)),
+        Err(err) => HttpResponse::InternalServerError().body(format!("Error: {}", err)),
     }
 }
 
+/// Exclui um deck e seus flashcards associados.
+///
+/// # Parâmetros
+/// - `client`: Instância do cliente MongoDB.
+/// - `deck_id`: ID do deck a ser excluído.
+///
+/// # Retornos
+/// - `200 OK`: Deck excluído.
+/// - `400 Bad Request`: ID inválido.
+/// - `500 Internal Server Error`: Falha ao excluir o deck.
 #[delete("/decks/{deck_id}")]
 pub async fn delete_deck(client: web::Data<Client>, deck_id: web::Path<String>) -> HttpResponse {
     let database: Database = client.database(DATABASE);
@@ -98,12 +189,12 @@ pub async fn delete_deck(client: web::Data<Client>, deck_id: web::Path<String>) 
         .delete_many(doc! { "deck_id": deck_id.to_string() })
         .await
     {
-        Ok(result) => result,
+        Ok(_) => (),
         Err(err) => return HttpResponse::InternalServerError().body(format!("Error: {}", err)),
     };
 
-    match decks.delete_one(doc! { "_id":  object_id }).await {
+    match decks.delete_one(doc! { "_id": object_id }).await {
         Ok(_) => HttpResponse::Ok().body(deck_id.to_string()),
-        Err(err) => return HttpResponse::InternalServerError().body(format!("Error: {}", err)),
+        Err(err) => HttpResponse::InternalServerError().body(format!("Error: {}", err)),
     }
 }

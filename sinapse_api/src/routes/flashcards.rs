@@ -1,14 +1,14 @@
-use std::str::FromStr;
+use std::{result, str::FromStr};
 
 use actix_web::{
     delete, get, post,
     web::{self, Json},
     HttpResponse,
 };
-use bson::{doc, oid::ObjectId, Document};
+use bson::{doc, document, oid::ObjectId, Document};
 use mongodb::{Client, Collection};
 
-use crate::models::flashcard::Flashcard;
+use crate::models::flashcard::{Flashcard, ResponseFlashcard};
 use crate::utils::db::*;
 
 const DATABASE: &str = "SinapseDB";
@@ -40,15 +40,30 @@ pub async fn post_flashcard(
 
 #[get("/flashcards/{deck_id}")]
 pub async fn get_flashcards(client: web::Data<Client>, deck_id: web::Path<String>) -> HttpResponse {
-    let collection: Collection<Flashcard> = client.database(DATABASE).collection(FLASHCARDS);
+    let collection: Collection<Document> = client.database(DATABASE).collection(FLASHCARDS);
 
     let filter: Document = doc! { "deck_id": deck_id.to_string() };
 
-    let result: Result<Vec<Flashcard>, mongodb::error::Error> =
+    let result: Result<Vec<Document>, mongodb::error::Error> =
         find_all_documents(&collection, filter).await;
 
     match result {
-        Ok(flashcards) => HttpResponse::Ok().json(flashcards),
+        Ok(documents) => {
+            let response_flashcards: Vec<ResponseFlashcard> = documents
+                .iter()
+                .map(|doc| {
+                    let object_id = doc.get("_id").unwrap().as_object_id().unwrap();
+                    ResponseFlashcard {
+                        id: object_id.to_hex().to_string(),
+                        deck_id: doc.get_str("deck_id").unwrap().to_string(),
+                        question: doc.get_str("question").unwrap().to_string(),
+                        answer: doc.get_str("answer").unwrap().to_string(),
+                    }
+                })
+                .collect();
+
+            HttpResponse::Ok().json(response_flashcards)
+        }
         Err(err) => return HttpResponse::InternalServerError().body(format!("Error: {}", err)),
     }
 }

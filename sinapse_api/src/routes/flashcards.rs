@@ -53,6 +53,7 @@ use actix_web::{
 };
 use bson::{doc, oid::ObjectId, Document};
 use mongodb::{Client, Collection};
+use serde_json::json;
 
 use crate::models::flashcard::{Flashcard, ResponseFlashcard};
 use crate::utils::db::*;
@@ -88,7 +89,7 @@ pub async fn post_flashcard(
                 .unwrap()
                 .to_hex()
                 .to_string();
-            HttpResponse::Created().body(flashcard_id)
+            HttpResponse::Created().json(json!({"id": flashcard_id}))
         }
         Err(err) => HttpResponse::InternalServerError().body(err.to_string()),
     }

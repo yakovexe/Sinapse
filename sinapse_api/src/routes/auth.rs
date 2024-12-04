@@ -67,7 +67,7 @@ async fn post_user(client: web::Data<Client>, Json(user): web::Json<User>) -> Ht
                 .unwrap()
                 .to_hex()
                 .to_string();
-            HttpResponse::Created().body(user_id)
+            HttpResponse::Created().json(json!({"id": user_id}))
         }
         Err(err) => HttpResponse::InternalServerError().body(err.to_string()),
     }

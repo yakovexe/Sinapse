@@ -59,6 +59,7 @@ use actix_web::{
 };
 use bson::{doc, oid::ObjectId, Document};
 use mongodb::{Client, Collection, Database};
+use serde_json::json;
 use std::str::FromStr;
 
 use crate::{
@@ -94,7 +95,7 @@ async fn post_deck(client: web::Data<Client>, Json(deck): web::Json<Deck>) -> Ht
                 .unwrap()
                 .to_hex()
                 .to_string();
-            HttpResponse::Created().body(deck_id)
+            HttpResponse::Created().json(json!({"id": deck_id}))
         }
         Err(err) => HttpResponse::InternalServerError().body(err.to_string()),
     }

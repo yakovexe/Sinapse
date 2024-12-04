@@ -109,3 +109,22 @@ pub async fn get_user(client: web::Data<Client>, user_id: web::Path<String>) -> 
         Err(err) => HttpResponse::InternalServerError().body(format!("Error: {}", err)),
     }
 }
+
+#[post("/users/auth")]
+pub async fn auth_user(client: web::Data<Client>, Json(user): web::Json<User>) -> HttpResponse {
+    let collection: Collection<Document> = client.database(DATABASE).collection(USERS);
+
+    let filter = doc! {
+        "username": &user.username,
+        "password": &user.password,
+    };
+
+    match collection.find_one(filter).await {
+        Ok(Some(doc)) => match doc.get_object_id("_id") {
+            Ok(object_id) => HttpResponse::Ok().json(json!({"id": object_id.to_string()})),
+            Err(_) => HttpResponse::InternalServerError().body("Failed to retrieve ObjectId"),
+        },
+        Ok(None) => HttpResponse::NotFound().body("User not found"),
+        Err(err) => HttpResponse::InternalServerError().body(format!("Database error: {}", err)),
+    }
+}

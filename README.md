@@ -33,3 +33,8 @@ Neste ponto a aplicação irá ser compilada e você deve ver a seguinte mensage
      Running `target\debug\sinapse_api.exe`
 Server running at http://127.0.0.1:8080
 ```
+## Documentação
+A documentação para a API e todas suas dependências pode ser gerada e acessada executando o seguinte comando na root do projeto (`sinapse_api/`:
+```bash
+cargo doc --open
+```

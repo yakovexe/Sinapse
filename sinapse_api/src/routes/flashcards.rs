@@ -164,7 +164,7 @@ pub async fn delete_flashcard(
     let result = collection.delete_one(filter).await;
 
     match result {
-        Ok(_) => HttpResponse::Ok().body(flashcard_id.to_string()),
+        Ok(_) => HttpResponse::Ok().json(json!({"id": flashcard_id.to_string()})),
         Err(err) => HttpResponse::InternalServerError().body(format!("Error: {}", err)),
     }
 }

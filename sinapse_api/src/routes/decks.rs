@@ -195,7 +195,7 @@ pub async fn delete_deck(client: web::Data<Client>, deck_id: web::Path<String>) 
     };
 
     match decks.delete_one(doc! { "_id": object_id }).await {
-        Ok(_) => HttpResponse::Ok().body(deck_id.to_string()),
+        Ok(_) => HttpResponse::Ok().json(json!({"id": deck_id.to_string()})),
         Err(err) => HttpResponse::InternalServerError().body(format!("Error: {}", err)),
     }
 }

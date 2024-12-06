@@ -11,24 +11,12 @@ import asyncio
 
 load_dotenv()
 
-class Trivia(commands.Cog, name="Trivia"):
+class Decks(commands.Cog, name="Decks"):
     def __init__(self, bot):
         self.bot = bot
-        self.questions = [
-            {
-                "question": "Capital da França",
-                "answer": "Paris"
-            },
-            {
-                "question": "Maior planeta do sistema solar",
-                "answer": "Jupiter"
-            }
-            # Add more questions here
-        ]
-        self.current_question = None
 
-    @commands.hybrid_command(name="trivia", description="Start a trivia game")
-    async def start_trivia(self, context: Context) -> None:
+    @commands.hybrid_command(name="decks", description="Show decks available")
+    async def decks(self, context: Context, *, deck_name: str = None) -> None:
         self.current_question = random.choice(self.questions)
         await context.send(self.current_question["question"])
         await self.wait_for_answer(context)
@@ -51,4 +39,4 @@ class Trivia(commands.Cog, name="Trivia"):
         self.current_question = None
 
 async def setup(bot) -> None:
-    await bot.add_cog(Trivia(bot))
+    await bot.add_cog(Decks(bot))

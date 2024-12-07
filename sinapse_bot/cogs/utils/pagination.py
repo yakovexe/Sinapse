@@ -2,7 +2,6 @@ import discord
 from typing import Callable, Optional
 from discord.ext.commands import Context
 
-
 class Pagination(discord.ui.View):
     def __init__(self, context: Context, get_page: Callable):
         self.context = context
@@ -61,7 +60,7 @@ class Pagination(discord.ui.View):
             self.index = self.total_pages
         else:
             self.index = 1
-            
+
         await self.edit_page(interaction)
 
     async def on_timeout(self):

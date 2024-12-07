@@ -3,40 +3,32 @@
 import discord
 from discord.ext import commands
 from discord.ext.commands import Context
-from discord import app_commands
-from dotenv import load_dotenv
-import os
-import random
-import asyncio
+from cogs.utils.pagination import Pagination
 
-load_dotenv()
+from cogs.services.deck_service import DeckService
+
+deck_service = DeckService()
+L = 10
 
 class Decks(commands.Cog, name="Decks"):
     def __init__(self, bot):
         self.bot = bot
 
     @commands.hybrid_command(name="decks", description="Show decks available")
-    async def decks(self, context: Context, *, deck_name: str = None) -> None:
-        self.current_question = random.choice(self.questions)
-        await context.send(self.current_question["question"])
-        await self.wait_for_answer(context)
+    async def decks(self, context: Context, user_id: str = None) -> None:
+        decks = await deck_service.get_decks(user_id)
 
-    async def wait_for_answer(self, context: Context) -> None:
-        def check(message):
-            return message.author == context.author and message.channel == context.channel
+        async def get_page(page: int):
+            emb = discord.Embed(title="Decks do Usuário", description="")
+            offset = (page-1) * L
+            for deck in decks[offset:offset+L]:
+                emb.description += f"{deck['name']} - {deck['id']}\n"
+            n = Pagination.compute_total_pages(len(decks), L)
+            emb.set_footer(text=f"Página {page} de {n}")
+            return emb, n
 
-        try:
-            message = await self.bot.wait_for('message', check=check, timeout=30)
-        except asyncio.TimeoutError:
-            await context.send("Acabou o tempo!")
-            return
+        await Pagination(context, get_page).navigate()
 
-        if message.content.lower() == self.current_question["answer"].lower():
-            await context.send("Certo!")
-        else:
-            await context.send(f"A resposta era {self.current_question['answer']}")
-
-        self.current_question = None
 
 async def setup(bot) -> None:
     await bot.add_cog(Decks(bot))

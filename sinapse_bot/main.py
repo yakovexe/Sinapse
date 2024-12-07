@@ -38,7 +38,7 @@ class DiscordBot(commands.Bot):
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message) -> None:
-        print("vai processar")
+        print("Using command")
         await self.process_commands(message)
 
     async def on_command_completion(self, context: Context) -> None:
@@ -89,7 +89,6 @@ class DiscordBot(commands.Bot):
         elif isinstance(error, commands.MissingRequiredArgument):
             embed = discord.Embed(
                 title="Error!",
-                # We need to capitalize because the command arguments have no capital letter in the code and they are the first word in the error message.
                 description=str(error).capitalize(),
                 color=0xE02B2B,
             )

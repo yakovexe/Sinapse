@@ -12,14 +12,21 @@ class TriviaController():
             self.flashcards.remove(self.current_flashcard)
         if(len(self.flashcards) != 0): 
             self.current_flashcard = random.choice(self.flashcards)
+            return True
         else:
-            return None
+            return False
         
     def get_question(self):
         return self.current_flashcard.question
     
+    def get_answer(self):
+        return self.current_flashcard.answer
+    
     def check_answer(self, user_answer):
-        return self.current_flashcard.check_answer(user_answer)
+        return self.current_flashcard.answer.lower() == user_answer.lower()
+
+    def update_player_score(self, author):
+        pass
 
     def get_results(self):
         pass

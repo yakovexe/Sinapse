@@ -41,7 +41,7 @@ class Play(commands.Cog, name="Play"):
 
         if message.content.lower() == "solo":
             print("solo")
-            self.trivia_controller = SingleplayerTriviaController(flashcards)
+            self.trivia_controller = SingleplayerTriviaController(flashcards, context.author)
         elif message.content.lower() == "multi":
             print("multi")
             self.trivia_controller = MultiplayerTriviaController(flashcards)
@@ -52,27 +52,38 @@ class Play(commands.Cog, name="Play"):
         await self.start_question(context)
 
     async def start_question(self, context: Context) -> None:
-        self.trivia_controller.set_random_flashcard_active()
-        print(self.trivia_controller.get_question())
+        response = self.trivia_controller.set_random_flashcard_active()
+        if(not response):
+            await self.show_results(context)
+            return
         await context.send(self.trivia_controller.get_question())
         await self.wait_for_answer(context)
 
     async def wait_for_answer(self, context: Context) -> None:
-        # def check(message):
-        #     return message.author == context.author and message.channel == context.channel
+        def check_user_and_channel(message):
+            return message.author == context.author and message.channel == context.channel
+        def check_channel(message):
+            return message.channel == context.channel
+        
+        check = check_user_and_channel if isinstance(self.trivia_controller, MultiplayerTriviaController) else check_channel
 
         try:
-            message = await self.bot.wait_for('message', check=None, timeout=30)
+            message = await self.bot.wait_for('message', check=check, timeout=30)
         except asyncio.TimeoutError:
             await context.send("Acabou o tempo!")
             return
 
-        if message.content.lower() == self.current_question["answer"].lower():
+        if self.trivia_controller.check_answer(message.content.lower()):
             await context.send("Certo!")
+            self.trivia_controller.update_player_score(context.author)
         else:
-            await context.send(f"A resposta era {self.current_question['answer']}")
+            await context.send(f"A resposta certa era {self.trivia_controller.get_answer()}.")
 
-        self.current_question = None
+        await self.start_question(context)
+
+    async def show_results(self, context):
+        await context.send(self.trivia_controller.get_results())
+        
 
 async def setup(bot) -> None:
     await bot.add_cog(Play(bot))

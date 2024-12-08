@@ -25,9 +25,9 @@ class MultiplayerTriviaController(TriviaController):
         if(any(getattr(player, "author", None) == author for player in self.players)):
             self.players[self.players.index(next(player for player in self.players if getattr(player, "author", None) == author))].update_score(score)
         else:
-            newPlayer = Player(author)
-            newPlayer.update_score(score)
-            self.players.append(newPlayer)
+            new_player = Player(author)
+            new_player.update_score(score)
+            self.players.append(new_player)
 
     def get_results(self) -> str:
         scores = [(player.get_name(), player.score) for player in self.players]

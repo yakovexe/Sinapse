@@ -59,9 +59,12 @@ class Play(commands.Cog, name="Play"):
         await self.wait_for_answer(context)
 
     async def wait_for_answer(self, context: Context) -> None:
+        message_author = None
         def check_user_and_channel(message):
+            message_author = message.author
             return message.author == context.author and message.channel == context.channel
         def check_channel(message):
+            message_author = message.author
             return message.channel == context.channel
         
         check = check_channel if isinstance(self.trivia_controller, MultiplayerTriviaController) else check_user_and_channel
@@ -77,7 +80,7 @@ class Play(commands.Cog, name="Play"):
             self.trivia_controller.update_player_score(context.author, 1)
         else:
             await context.send(f"A resposta certa era {self.trivia_controller.get_answer()}.")
-            self.trivia_controller.update_player_score(context.author, 0)
+            self.trivia_controller.update_player_score(message_author.author, 0)
 
         await self.start_question(context)
 

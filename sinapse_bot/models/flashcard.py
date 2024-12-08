@@ -1,4 +1,4 @@
-class Flashcard():
+class Flashcard:
     def __init__(self, question: str, answer: str, deck_id: int) -> None:
         self.question: str = question
         self.answer: str = answer

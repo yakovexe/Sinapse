@@ -1,35 +1,34 @@
 # Based on template by Krypton: https://github.com/kkrypt0nn/Python-Discord-Bot-Template/tree/main
 
-import discord
 from discord.ext import commands
 from discord.ext.commands import Context
-from discord import app_commands
-import random
 import asyncio
 from cogs.controllers.singleplayer_trivia_controller import SingleplayerTriviaController
 from cogs.controllers.multiplayer_trivia_controller import MultiplayerTriviaController
 from cogs.services.deck_service import DeckService
+from cogs.classes.flashcard import Flashcard
+from typing import List
 
 deck_service = DeckService()
 
 class Play(commands.Cog, name="Play"):
-    def __init__(self, bot):
+    def __init__(self, bot) -> None:
+        self.trivia_controller = None
+        self.current_question = None
         self.bot = bot
 
     @commands.hybrid_command(name="play", description="Start a trivia game")
     async def play(self, context: Context, deck_id: str = None) -> None:
         flashcards = await deck_service.get_deck(deck_id)
 
-        if(len(flashcards) == 0):
+        if len(flashcards) == 0:
             await context.send("Deck vazio ou inexistente!")
             return
 
         await context.send("Digite 'solo' para jogar sozinho ou 'multi' para jogar com amigos.")
-        # self.current_question = random.choice(self.questions)
-        # await context.send(self.current_question["question"])
         await self.wait_for_trivia_type(context, flashcards)
 
-    async def wait_for_trivia_type(self, context: Context, flashcards) -> None:
+    async def wait_for_trivia_type(self, context: Context, flashcards: List[Flashcard]) -> None:
         def check(message):
             return message.author == context.author and message.channel == context.channel
         
@@ -47,7 +46,7 @@ class Play(commands.Cog, name="Play"):
             self.trivia_controller = MultiplayerTriviaController(flashcards)
         else:
             await context.send("Resposta inválida. Tente novamente.")
-            await self.wait_for_trivia_type(context)
+            await self.wait_for_trivia_type(context, flashcards)
             return
         await self.start_question(context)
 
@@ -65,7 +64,7 @@ class Play(commands.Cog, name="Play"):
         def check_channel(message):
             return message.channel == context.channel
         
-        check = check_user_and_channel if isinstance(self.trivia_controller, MultiplayerTriviaController) else check_channel
+        check = check_channel if isinstance(self.trivia_controller, MultiplayerTriviaController) else check_user_and_channel
 
         try:
             message = await self.bot.wait_for('message', check=check, timeout=30)

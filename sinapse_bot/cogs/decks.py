@@ -18,7 +18,7 @@ class Decks(commands.Cog, name="Decks"):
     async def decks(self, context: Context, user_id: str = None) -> None:
         decks = await deck_service.get_decks(user_id)
 
-        async def get_page(page: int):
+        async def get_page(page: int) -> Pagination:
             emb = discord.Embed(title="Decks do Usuário", description="")
             offset = (page-1) * L
             for deck in decks[offset:offset+L]:

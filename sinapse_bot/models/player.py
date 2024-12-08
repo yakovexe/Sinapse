@@ -1,5 +1,5 @@
 class Player:
-    def __init__(self, name: str):
+    def __init__(self, name: str) -> None:
         self.name: str = name
         self.score: int = 0
 

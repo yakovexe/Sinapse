@@ -1,20 +1,17 @@
 # Based on template by Krypton: https://github.com/kkrypt0nn/Python-Discord-Bot-Template/tree/main
 
-import discord
 from discord.ext import commands
 from discord.ext.commands import Context
-from discord import app_commands
 from dotenv import load_dotenv
-import os
 
 load_dotenv()
 
 class Ping(commands.Cog, name="Ping"):
-    def __init__(self, bot):
+    def __init__(self, bot) -> None:
         self.bot = bot
 
     @commands.hybrid_command(name="ping", description="Returns Pong")
-    async def ping(self, context: Context):
+    async def ping(self, context: Context) -> None:
         await context.send("Pong")
 
 async def setup(bot) -> None:

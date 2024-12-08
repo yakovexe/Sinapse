@@ -21,11 +21,13 @@ class MultiplayerTriviaController(TriviaController):
     def get_answer(self) -> str:
         return super().get_answer()
     
-    def update_player_score(self, author: Union[discord.user.User, discord.member.Member]) -> None:
+    def update_player_score(self, author: Union[discord.user.User, discord.member.Member], score: int) -> None:
         if(any(getattr(player, "author", None) == author for player in self.players)):
-            self.players[self.players.index(next(player for player in self.players if getattr(player, "author", None) == author))].update_score(1)
+            self.players[self.players.index(next(player for player in self.players if getattr(player, "author", None) == author))].update_score(score)
         else:
-            self.players.append(Player(author))
+            newPlayer = Player(author)
+            newPlayer.update_score(score)
+            self.players.append(newPlayer)
 
     def get_results(self) -> str:
         scores = [(player.get_name(), player.score) for player in self.players]

@@ -74,9 +74,10 @@ class Play(commands.Cog, name="Play"):
 
         if self.trivia_controller.check_answer(message.content.lower()):
             await context.send("Certo!")
-            self.trivia_controller.update_player_score(context.author)
+            self.trivia_controller.update_player_score(context.author, 1)
         else:
             await context.send(f"A resposta certa era {self.trivia_controller.get_answer()}.")
+            self.trivia_controller.update_player_score(context.author, 0)
 
         await self.start_question(context)
 

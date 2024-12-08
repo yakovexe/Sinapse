@@ -14,7 +14,6 @@ deck_service = DeckService()
 class Play(commands.Cog, name="Play"):
     def __init__(self, bot) -> None:
         self.trivia_controller = None
-        self.current_question = None
         self.bot = bot
 
     @commands.hybrid_command(name="play", description="Start a trivia game")
@@ -81,7 +80,7 @@ class Play(commands.Cog, name="Play"):
 
         await self.start_question(context)
 
-    async def show_results(self, context):
+    async def show_results(self, context: Context) -> None:
         await context.send(self.trivia_controller.get_results())
         
 

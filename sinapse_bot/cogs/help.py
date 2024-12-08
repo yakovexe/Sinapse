@@ -11,7 +11,7 @@ class Help(commands.Cog, name="Help"):
         self.bot = bot
 
     @commands.hybrid_command(name="help", description="Returns a list of commands and usage tips")
-    async def ping(self, context: Context) -> None:
+    async def help(self, context: Context) -> None:
         await context.send('''
 `!help`: list of commands and usage tips
 `!decks`: <user_id> load decks from user account

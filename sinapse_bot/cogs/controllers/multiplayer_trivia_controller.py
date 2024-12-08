@@ -7,7 +7,7 @@ from typing import List, Union
 class MultiplayerTriviaController(TriviaController):
     def __init__(self, flashcards: List[Flashcard]) -> None:
         super().__init__(flashcards)
-        self.players = []
+        self.players: List[Player] = []
 
     def set_random_flashcard_active(self) -> bool:
         return super().set_random_flashcard_active()

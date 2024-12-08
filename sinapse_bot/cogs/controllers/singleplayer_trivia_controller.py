@@ -25,8 +25,8 @@ class SingleplayerTriviaController(TriviaController):
     def get_answer(self) -> str:
         return super().get_answer()
     
-    def update_player_score(self, _: Union[discord.user.User, discord.member.Member]) -> None:
-        self.player.update_score(1)
+    def update_player_score(self, _: Union[discord.user.User, discord.member.Member], score: int) -> None:
+        self.player.update_score(score)
 
     def get_results(self) -> str:
         return "Seu total de pontos foi "+ str(self.player.get_score()) + "!"

@@ -6,13 +6,17 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-class Ping(commands.Cog, name="Ping"):
+class Help(commands.Cog, name="Help"):
     def __init__(self, bot) -> None:
         self.bot = bot
 
-    @commands.hybrid_command(name="ping", description="Returns Pong")
+    @commands.hybrid_command(name="help", description="Returns a list of commands and usage tips")
     async def ping(self, context: Context) -> None:
-        await context.send("Pong")
+        await context.send('''
+`!help`: list of commands and usage tips
+`!decks`: <user_id> load decks from user account
+`!play`: <deck_id> starts a multi or solo game using the deck
+''')
 
 async def setup(bot) -> None:
-    await bot.add_cog(Ping(bot))
+    await bot.add_cog(Help(bot))

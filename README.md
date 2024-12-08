@@ -38,3 +38,34 @@ A documentação para a API e todas suas dependências pode ser gerada e acessad
 ```bash
 cargo doc --open
 ```
+
+# Executando o SinapseFrontend localmente
+## Instalando o NodeJs
+Instale o `NodeJs` no seu sistema para compilar o programa. Você pode encontrar as instruções de instalação especificas para seu ambiente em https://nodejs.org/ptl.
+
+## Executando a aplicação web
+Execute a api e o banco de dados presentes nesse repositório com as instruções acima e depois siga os passos a seguir:
+
+Acesse seu clone deste repositório e navegue para o diretório da aplicação web e execute os seguintes comandos no seu terminal:
+```bash
+npm i
+npm run dev
+```
+
+Em seguida você verá a mensagem de que a aplicação está rodando e receberá o url para utilizá-la, apenas abra a url no navegador de sua escolha.
+
+# Executando o SinapseBot localmente
+## Instalando o Python
+Instale o `Python` para seu ambiente em: https://www.python.org/downloads/.
+
+## Instalando o Discord.Py
+Siga o passo a passo presente no url a seguir: https://discordpy.readthedocs.io/en/stable/intro.html#virtual-environments.
+
+## Executando o bot
+Execute a api e o banco de dados presentes nesse repositório com as instruções acima e depois siga os passos a seguir:
+
+Acesse seu clone deste repositório e navegue para o diretório do bot e execute os seguintes comandos no seu terminal:
+
+```bash
+python3 ./main.py
+```
